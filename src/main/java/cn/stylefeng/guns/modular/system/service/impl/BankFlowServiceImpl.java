@@ -4,10 +4,14 @@ import cn.stylefeng.guns.modular.system.components.redis.RedisDao;
 import cn.stylefeng.guns.modular.system.components.redis.impl.RedisDistributedLock;
 import cn.stylefeng.guns.modular.system.constant.Constant;
 import cn.stylefeng.guns.modular.system.dao.BankFlowMapper;
+import cn.stylefeng.guns.modular.system.dto.ResponseResult;
 import cn.stylefeng.guns.modular.system.service.IBankFlowService;
 import cn.stylefeng.guns.modular.system.service.IBankMgrParmService;
 import cn.stylefeng.guns.modular.system.utils.StringUtils;
+import cn.stylefeng.guns.modular.system.utils.http.HttpClient;
 import cn.stylefeng.roses.kernel.model.exception.ServiceException;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.service.impl.ServiceImpl;
 
 
@@ -18,7 +22,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+
 import javax.annotation.Resource;
+
+import java.util.List;
 
 import static cn.stylefeng.guns.modular.system.constant.BankManageEnum.*;
 import static cn.stylefeng.guns.modular.system.constant.Constant.BANK_FLOW_DONE;
@@ -51,30 +58,7 @@ public class BankFlowServiceImpl extends ServiceImpl<BankFlowMapper, BankFlow> i
     @Resource
     private RedisDistributedLock redisDistributedLock;
 
-
-    @Override
-    @Transactional
-    public void processCashflow(Integer last_cursor) {
-        Integer batchNum = bankMgrParmService.getBatchNum();
-        if(StringUtils.isEmpty(batchNum)){
-            logger.info("processCashflow failed ,batchNum = 0 or null");
-            return;
-        }
-        Boolean success = handleBankFlow(last_cursor, BANK_FLOW_PROCESSING);
-        if(!success){
-            logger.info("last_cursor{} has been processed skip it",last_cursor);
-            return;
-        }
-        //1.拿到行锁用于发送这条记录,如果发送失败则事务回滚
-
-        success = handleBankFlow(last_cursor,BANK_FLOW_DONE);
-        //2.如果成功则打上完成标记
-        if(!success){
-            throw new ServiceException(BANK_CARD_CASH_FLOW_HANDLE_FLOW_DONE_FAILED);
-        }
-    }
-
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void processCashflows(){
         boolean locked_cashflow = true;
         String lock = redisDao.getKey(Constant.Lock.CASH_FLOW_LOCK_PREFIX, "");
@@ -90,10 +74,9 @@ public class BankFlowServiceImpl extends ServiceImpl<BankFlowMapper, BankFlow> i
                     logger.info("processCashflow failed ,no last_cursor");
                     return;
                 }
-                int count = 0;
-                for (;count < batchNum;count ++){
-                    processCashflow(last_cursor + count);
-                }
+                int count = beforeSend(batchNum, last_cursor);
+                doSend();
+                afterSend();
                 bankMgrParmService.updateLastCursor(last_cursor + count);
             }else {
                 locked_cashflow = false;
@@ -109,6 +92,38 @@ public class BankFlowServiceImpl extends ServiceImpl<BankFlowMapper, BankFlow> i
         }
 
 
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    private int beforeSend(Integer batchNum, Integer last_cursor) {
+        int count = 0;
+        for (;count < batchNum;count ++){
+            Boolean success = handleBankFlow(last_cursor + count, BANK_FLOW_PROCESSING);
+            if(!success){
+                logger.info("last_cursor{} has been processed skip it",last_cursor);
+                continue;
+            }
+        }
+        return count;
+    }
+
+    private void doSend(){
+        List<BankFlow> flows = bankFlowMapper.getFlowsByStatus(BANK_FLOW_PROCESSING);
+        String stream = JSON.toJSONString(flows);
+        //发送
+        String url = "";
+        String responseStr = HttpClient.sendPost(url +"",stream);
+        logger.info("push cashflow 反馈{}", responseStr);
+        ResponseResult response = JSONObject.parseObject(responseStr, ResponseResult.class);
+        if (response.getCode() != 200) {
+            logger.error("流水转发失败!!!! error->  "+response);
+            throw new ServiceException(BANK_CARD_CASH_FLOW_FORWARD_FAILED);
+        }
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    private void afterSend(){
+        bankFlowMapper.handleBankFlows(BANK_FLOW_DONE);
     }
 
 

@@ -13,7 +13,5 @@ import cn.stylefeng.guns.modular.system.model.BankFlow;
  */
 public interface IBankFlowService extends IService<BankFlow> {
 
-    void processCashflow(Integer last_cursor);
-
     void processCashflows();
 }
