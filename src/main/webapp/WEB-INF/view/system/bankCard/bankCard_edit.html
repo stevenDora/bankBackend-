@@ -1,0 +1,39 @@
+@layout("/common/_container.html"){
+<div class="ibox float-e-margins">
+    <div class="ibox-content">
+        <div class="form-horizontal">
+
+            <div class="row">
+                <div class="col-sm-6 b-r">
+                            <#input id="id" name="" value="${item.id}" underline="true"/>
+                            <#input id="cardNo" name="" value="${item.cardNo}" underline="true"/>
+                            <#input id="name" name="" value="${item.name}" underline="true"/>
+                            <#input id="address" name="" value="${item.address}" underline="true"/>
+                            <#input id="bankCode" name="" value="${item.bankCode}" underline="true"/>
+                            <#input id="status" name="0:关闭，1：开启" value="${item.status}" underline="true"/>
+                            <#input id="onlineStatus" name="0:离线，1：在线" value="${item.onlineStatus}" />
+                </div>
+
+                <div class="col-sm-6">
+                            <#input id="avaliableAmount" name="" value="${item.avaliableAmount}" underline="true"/>
+                            <#input id="recvAmount" name="" value="${item.recvAmount}" underline="true"/>
+                            <#input id="pendingAmount" name="" value="${item.pendingAmount}" underline="true"/>
+                            <#input id="limitAmount" name="" value="${item.limitAmount}" underline="true"/>
+                            <#input id="lastTransactionTime" name="" value="${item.lastTransactionTime}" underline="true"/>
+                            <#input id="crtTime" name="" value="${item.crtTime}" underline="true"/>
+                            <#input id="uptTime" name="" value="${item.uptTime}" />
+                </div>
+            </div>
+
+            <div class="row btn-group-m-t">
+                <div class="col-sm-10">
+                    <#button btnCss="info" name="提交" id="ensure" icon="fa-check" clickFun="BankCardInfoDlg.editSubmit()"/>
+                    <#button btnCss="danger" name="取消" id="cancel" icon="fa-eraser" clickFun="BankCardInfoDlg.close()"/>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+<script src="${ctxPath}/static/modular/system/bankCard/bankCard_info.js"></script>
+@}

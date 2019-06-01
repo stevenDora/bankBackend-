@@ -1,0 +1,38 @@
+@layout("/common/_container.html"){
+<div class="row">
+    <div class="col-sm-12">
+        <div class="ibox float-e-margins">
+            <div class="ibox-title">
+                <h5>管理</h5>
+            </div>
+            <div class="ibox-content">
+                <div class="row row-lg">
+                    <div class="col-sm-12">
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <#NameCon id="condition" name="名称" />
+                            </div>
+                            <div class="col-sm-3">
+                                <#button name="搜索" icon="fa-search" clickFun="BankFlow.search()"/>
+                            </div>
+                        </div>
+                        <div class="hidden-xs" id="BankFlowTableToolbar" role="group">
+                            @if(shiro.hasPermission("/bankFlow/add")){
+                                <#button name="添加" icon="fa-plus" clickFun="BankFlow.openAddBankFlow()"/>
+                            @}
+                            @if(shiro.hasPermission("/bankFlow/update")){
+                                <#button name="修改" icon="fa-edit" clickFun="BankFlow.openBankFlowDetail()" space="true"/>
+                            @}
+                            @if(shiro.hasPermission("/bankFlow/delete")){
+                                <#button name="删除" icon="fa-remove" clickFun="BankFlow.delete()" space="true"/>
+                            @}
+                        </div>
+                        <#table id="BankFlowTable"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="${ctxPath}/static/modular/system/bankFlow/bankFlow.js"></script>
+@}
