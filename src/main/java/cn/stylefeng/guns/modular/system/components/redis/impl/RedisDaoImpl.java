@@ -1,6 +1,8 @@
 package cn.stylefeng.guns.modular.system.components.redis.impl;
 
 import cn.stylefeng.guns.modular.system.components.redis.RedisDao;
+import cn.stylefeng.guns.modular.system.constant.Constant;
+import cn.stylefeng.guns.modular.system.utils.DateUtil;
 import cn.stylefeng.guns.modular.system.utils.SerializeUtils;
 import cn.stylefeng.guns.modular.system.utils.StringUtils;
 import com.alibaba.fastjson.JSONObject;
@@ -15,6 +17,7 @@ import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -195,4 +198,12 @@ public class RedisDaoImpl implements RedisDao {
     public Set<RedisZSetCommands.Tuple> zrange(String prefix, String key, int startIndex, int endIndex) {
         return (Set<RedisZSetCommands.Tuple>) redisTemplate.execute((RedisCallback<Set<RedisZSetCommands.Tuple>>) connection -> connection.zRangeWithScores(getKey(prefix, key).getBytes(),startIndex,endIndex));
     }
+
+    @Override
+    public String getOrderNo() {
+        return DateUtil.getFormatDate(new Date(), "yyyyMMddHHmmss")
+                + "00"
+                + this.incr(Constant.OrderPrefix.PLATFORM_SYSTEM_ORDER_NO,"");
+    }
+
 }

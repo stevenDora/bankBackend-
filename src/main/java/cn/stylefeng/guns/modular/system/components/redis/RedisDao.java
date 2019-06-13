@@ -44,4 +44,6 @@ public interface RedisDao {
         sb.append(key);
         return sb.toString();
     }
+
+    public String getOrderNo();
 }

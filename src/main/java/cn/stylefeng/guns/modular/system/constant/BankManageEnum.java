@@ -31,7 +31,8 @@ public enum BankManageEnum implements AbstractBaseExceptionEnum {
     BANK_CARD_CASH_FLOW_FORWARD_FAILED(463,"流水转发失败!!"),
 
 
-    BANK_CARD_LOCK_FAILED(471,"分布式锁失败！！");
+    BANK_CARD_LOCK_FAILED(471,"分布式锁失败！！"),
+    GENERATION_ORDER_NO_FAILED(472,"生成平台订单号失败！！");
 
 
     private String desc;

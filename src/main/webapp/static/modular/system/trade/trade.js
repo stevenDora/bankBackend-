@@ -17,6 +17,17 @@ Trade.initColumn = function () {
             {title: '平台订单号', field: 'orderNo', visible: true, align: 'center', valign: 'middle'},
             {title: '商户编号', field: 'companyNo', visible: true, align: 'center', valign: 'middle'},
             {title: '商户订单号', field: 'companyOrderNo', visible: true, align: 'center', valign: 'middle'},
+            {title: '渠道号', field: 'channel', visible: true, align: 'center', valign: 'middle',
+                formatter: function(value,row, index){
+                    var channel=row.channel;
+                    if(channel == 1){
+                        return '<label for="online"><font color="blue">支付宝</font></label>';
+                    } else if(channel == 2){
+                        return '<label for="offline"><font color="blue">微信</font></label>';
+                    }else if(channel == 3){
+                        return '<label for="unknown"><font color="blue">银行卡</font></label>';
+                    }
+                }},
             {title: '申请金额', field: 'applyAmount', visible: true, align: 'center', valign: 'middle'},
             {title: '到账金额', field: 'actualAmount', visible: true, align: 'center', valign: 'middle'},
             {title: '商户手续费', field: 'serviceFee', visible: true, align: 'center', valign: 'middle'},

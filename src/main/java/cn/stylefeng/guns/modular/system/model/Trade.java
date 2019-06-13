@@ -6,6 +6,10 @@ import com.baomidou.mybatisplus.annotations.TableField;
 import com.baomidou.mybatisplus.activerecord.Model;
 import com.baomidou.mybatisplus.annotations.TableId;
 import com.baomidou.mybatisplus.enums.IdType;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 
@@ -17,6 +21,12 @@ import java.io.Serializable;
  * @author stylefeng
  * @since 2019-06-13
  */
+
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class Trade extends Model<Trade> {
 
     private static final long serialVersionUID = 1L;
@@ -41,6 +51,21 @@ public class Trade extends Model<Trade> {
      */
     @TableField("company_order_no")
     private String companyOrderNo;
+
+    public Integer getChannel() {
+        return channel;
+    }
+
+    public void setChannel(Integer channel) {
+        this.channel = channel;
+    }
+
+    /**
+     * 充值渠道类型:1:zfb 2:wx 3:yhk
+     */
+    @TableField("channel")
+    private Integer channel;
+
     /**
      * 申请金额
      */
@@ -197,22 +222,24 @@ public class Trade extends Model<Trade> {
         return this.id;
     }
 
+
     @Override
     public String toString() {
         return "Trade{" +
-        ", id=" + id +
-        ", orderNo=" + orderNo +
-        ", companyNo=" + companyNo +
-        ", companyOrderNo=" + companyOrderNo +
-        ", applyAmount=" + applyAmount +
-        ", actualAmount=" + actualAmount +
-        ", serviceFee=" + serviceFee +
-        ", orderStatus=" + orderStatus +
-        ", arriveTime=" + arriveTime +
-        ", pushTime=" + pushTime +
-        ", pushStatus=" + pushStatus +
-        ", crtTime=" + crtTime +
-        ", uptTime=" + uptTime +
-        "}";
+                "id=" + id +
+                ", orderNo='" + orderNo + '\'' +
+                ", companyNo='" + companyNo + '\'' +
+                ", companyOrderNo='" + companyOrderNo + '\'' +
+                ", channel=" + channel +
+                ", applyAmount=" + applyAmount +
+                ", actualAmount=" + actualAmount +
+                ", serviceFee=" + serviceFee +
+                ", orderStatus=" + orderStatus +
+                ", arriveTime=" + arriveTime +
+                ", pushTime=" + pushTime +
+                ", pushStatus=" + pushStatus +
+                ", crtTime=" + crtTime +
+                ", uptTime=" + uptTime +
+                '}';
     }
 }

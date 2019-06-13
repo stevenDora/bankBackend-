@@ -89,6 +89,8 @@ public class BankCardServiceImpl extends ServiceImpl<BankCardMapper, BankCard> i
             int affectRows = bankCardMapper.updateCardData(card.getId(), req.getAmount());
             if(affectRows == 1){
                 matchedCard = card;
+                logger.info("bankSelect suc!!! cardInfo - > "+matchedCard.toString());
+                break;
             }
         }
 
