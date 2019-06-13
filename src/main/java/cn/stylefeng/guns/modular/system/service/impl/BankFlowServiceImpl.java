@@ -27,7 +27,7 @@ import javax.annotation.Resource;
 
 import java.util.List;
 
-import static cn.stylefeng.guns.modular.system.constant.BankManageEnum.*;
+import static cn.stylefeng.guns.modular.system.constant.PayApiEnum.*;
 import static cn.stylefeng.guns.modular.system.constant.Constant.BANK_FLOW_DONE;
 import static cn.stylefeng.guns.modular.system.constant.Constant.BANK_FLOW_PROCESSING;
 

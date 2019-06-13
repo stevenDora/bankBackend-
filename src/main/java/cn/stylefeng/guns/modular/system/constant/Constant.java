@@ -35,4 +35,16 @@ public class Constant {
     public interface OrderPrefix {
         String PLATFORM_SYSTEM_ORDER_NO = "platform_system_order_no";
     }
+
+    public interface OrderStatus{
+        Integer ORDER_STATUS_PROCESS = 1;
+        Integer ORDER_STATUS_SUCCESS = 2;
+        Integer ORDER_STATUS_OVERDUE = 3;
+    }
+
+    public interface PushStatus{
+        Integer PUSH_STATUS_UNHANDLE = 1;
+        Integer PUSH_STATUS_SUCCESS = 2;
+    }
+
 }

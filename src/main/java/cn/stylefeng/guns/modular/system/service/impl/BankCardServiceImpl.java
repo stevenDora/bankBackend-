@@ -23,7 +23,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import static cn.stylefeng.guns.modular.system.constant.BankManageEnum.*;
+import static cn.stylefeng.guns.modular.system.constant.PayApiEnum.*;
 import static cn.stylefeng.guns.modular.system.constant.Constant.*;
 
 

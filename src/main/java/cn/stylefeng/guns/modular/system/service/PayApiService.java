@@ -5,5 +5,7 @@ import cn.stylefeng.guns.modular.system.model.Trade;
 
 public interface PayApiService{
     Object deposit(PayDepositReq req);
-    void createOrder(Trade trade);
+    void createOrder(PayDepositReq req,String orderNo);
+
+    Object getDepositDetail(String orderNo);
 }

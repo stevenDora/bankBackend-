@@ -20,7 +20,7 @@ import cn.stylefeng.guns.modular.system.service.IBankCardService;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-import static cn.stylefeng.guns.modular.system.constant.BankManageEnum.*;
+import static cn.stylefeng.guns.modular.system.constant.PayApiEnum.*;
 
 /**
  * 控制器

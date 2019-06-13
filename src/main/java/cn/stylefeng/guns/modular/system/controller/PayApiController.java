@@ -1,6 +1,7 @@
 package cn.stylefeng.guns.modular.system.controller;
 
 
+import cn.stylefeng.guns.modular.system.constant.PayApiEnum;
 import cn.stylefeng.guns.modular.system.dto.PayDepositReq;
 import cn.stylefeng.guns.modular.system.dto.ResponseResult;
 import cn.stylefeng.guns.modular.system.model.CompanyDo;
@@ -14,10 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.Map;
@@ -35,14 +33,15 @@ public class PayApiController {
     @Autowired
     private CompanyService companyService;
 
-    @ApiOperation("充值")
+    @ApiOperation("充值申请")
     @RequestMapping(value = "/deposit")
     @ResponseBody
     public Object deposit(@Valid @RequestBody PayDepositReq req,
                           BindingResult bindingResult){
 
         if (bindingResult.hasErrors()) {
-            return ResponseResult.builder().code(-1).msg(bindingResult.getFieldError().getDefaultMessage()).build();
+            return ResponseResult.builder().code(PayApiEnum.DEPOSIT_FAILED_INPUT_PARAMETERS.getCode())
+                    .msg(bindingResult.getFieldError().getDefaultMessage()).build();
         }
 
         String reqStr = JSONObject.toJSONString(req);
@@ -51,13 +50,22 @@ public class PayApiController {
 
 
         if (flag == false) {
-            return ResponseResult.builder().code(-2).msg("验签失败").build();
+            return ResponseResult.builder().code(PayApiEnum.DEPOSIT_FAILED_SIGN.getCode())
+                    .msg(PayApiEnum.DEPOSIT_FAILED_SIGN.getDesc()).build();
         }
 
         return payApi.deposit(req);
 
 
 
+    }
+
+
+    @ApiOperation("获取支付信息")
+    @RequestMapping(value = "/getDepositDetail/{orderNo}")
+    @ResponseBody
+    public Object getDepositDetail(@PathVariable String orderNo){
+        return payApi.getDepositDetail(orderNo);
     }
 
 

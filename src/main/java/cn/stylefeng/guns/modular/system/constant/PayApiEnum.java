@@ -4,7 +4,7 @@ import cn.stylefeng.roses.kernel.model.exception.AbstractBaseExceptionEnum;
 
 import cn.stylefeng.guns.modular.system.utils.StringUtils;
 
-public enum BankManageEnum implements AbstractBaseExceptionEnum {
+public enum PayApiEnum implements AbstractBaseExceptionEnum {
 
     BANK_CARD_SELECT_SUC(200,"選卡成功!!"),
     BANK_CARD_QUERY_SUC(200,"查詢最後一次交易時間成功!"),
@@ -32,14 +32,17 @@ public enum BankManageEnum implements AbstractBaseExceptionEnum {
 
 
     BANK_CARD_LOCK_FAILED(471,"分布式锁失败！！"),
-    GENERATION_ORDER_NO_FAILED(472,"生成平台订单号失败！！");
+    GENERATION_ORDER_NO_FAILED(472,"生成平台订单号失败！！"),
+    DEPOSIT_FAILED_SIGN(473,"充值申请失败,验签失败！！"),
+    DEPOSIT_FAILED_INPUT_PARAMETERS(474,"生成平台订单号失败请求参数有误！！"),
+    DEPOSIT_APPLY_SUCCESS(200,"申请充值成功！！");
 
 
     private String desc;
     private Integer code;
     private String message;
 
-    private BankManageEnum(int code, String desc){
+    private PayApiEnum(int code, String desc){
         this.code = code;
         this.desc = desc;
         this.message = desc;
@@ -66,10 +69,10 @@ public enum BankManageEnum implements AbstractBaseExceptionEnum {
         this.code = code;
     }
 
-    public final static BankManageEnum newInstance(int code) {
-        BankManageEnum[] s_ = BankManageEnum.values();
+    public final static PayApiEnum newInstance(int code) {
+        PayApiEnum[] s_ = PayApiEnum.values();
         if (StringUtils.isNotEmpty(s_)) {
-            for (BankManageEnum s_s : s_) {
+            for (PayApiEnum s_s : s_) {
                 if (s_s.getCode() == code) {
                     return s_s;
                 }

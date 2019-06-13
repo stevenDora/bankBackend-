@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 
-import static cn.stylefeng.guns.modular.system.constant.BankManageEnum.BANK_CARD_LOCK_FAILED;
+import static cn.stylefeng.guns.modular.system.constant.PayApiEnum.BANK_CARD_LOCK_FAILED;
 import static cn.stylefeng.guns.modular.system.constant.Constant.Lock.CASH_FLOW_LOCK_PREFIX;
 
 

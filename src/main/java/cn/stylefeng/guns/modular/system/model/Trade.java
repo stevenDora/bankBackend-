@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.annotations.TableField;
 import com.baomidou.mybatisplus.activerecord.Model;
 import com.baomidou.mybatisplus.annotations.TableId;
 import com.baomidou.mybatisplus.enums.IdType;
+import io.swagger.models.auth.In;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -45,7 +46,7 @@ public class Trade extends Model<Trade> {
      * 商户编号
      */
     @TableField("company_no")
-    private String companyNo;
+    private Integer companyNo;
     /**
      * 商户订单号
      */
@@ -127,14 +128,6 @@ public class Trade extends Model<Trade> {
 
     public void setOrderNo(String orderNo) {
         this.orderNo = orderNo;
-    }
-
-    public String getCompanyNo() {
-        return companyNo;
-    }
-
-    public void setCompanyNo(String companyNo) {
-        this.companyNo = companyNo;
     }
 
     public String getCompanyOrderNo() {
