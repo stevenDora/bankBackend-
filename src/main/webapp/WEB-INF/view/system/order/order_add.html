@@ -1,0 +1,38 @@
+@layout("/common/_container.html"){
+<div class="ibox float-e-margins">
+    <div class="ibox-content">
+        <div class="form-horizontal">
+
+            <div class="row">
+                <div class="col-sm-6 b-r">
+                            <#input id="id" name="" underline="true"/>
+                            <#input id="orderNo" name="平台订单号" underline="true"/>
+                            <#input id="companyNo" name="商户编号" underline="true"/>
+                            <#input id="companyOrderNo" name="商户订单号" underline="true"/>
+                            <#input id="applyAmount" name="申请金额" underline="true"/>
+                            <#input id="actualAmount" name="到账金额" underline="true"/>
+                            <#input id="serviceFee" name="商户手续费"/>
+                </div>
+
+                <div class="col-sm-6">
+                            <#input id="orderStatus" name="订单状态:1:processing 2:success 3:overtime" underline="true"/>
+                            <#input id="arriveTime" name="到账时间" underline="true"/>
+                            <#input id="pushTime" name="回调时间" underline="true"/>
+                            <#input id="pushStatus" name="回调状态" underline="true"/>
+                            <#input id="crtTime" name="创建时间" underline="true"/>
+                            <#input id="uptTime" name="最后一次更新时间" underline="true"/>
+                </div>
+            </div>
+
+            <div class="row btn-group-m-t">
+                <div class="col-sm-10">
+                    <#button btnCss="info" name="提交" id="ensure" icon="fa-check" clickFun="OrderInfoDlg.addSubmit()"/>
+                    <#button btnCss="danger" name="取消" id="cancel" icon="fa-eraser" clickFun="OrderInfoDlg.close()"/>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+<script src="${ctxPath}/static/modular/system/order/order_info.js"></script>
+@}
