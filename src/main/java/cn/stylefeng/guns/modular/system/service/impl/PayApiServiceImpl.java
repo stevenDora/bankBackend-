@@ -44,7 +44,7 @@ public class PayApiServiceImpl implements PayApiService {
     @Autowired
     private RedisDao redisDao;
 
-    private String PAYLINK_PREFIX = "http://localhost:8080/payApi/";
+    private String PAYLINK_PREFIX = "http://localhost:8080/payApi/counter/";
 
 
     @Override
