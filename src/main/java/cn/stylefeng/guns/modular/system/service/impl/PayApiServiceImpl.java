@@ -98,6 +98,11 @@ public class PayApiServiceImpl implements PayApiService {
         tradeService.insert(trade);
     }
 
+    @Override
+    public Object getDepositDetail(String orderNo) {
+        return null;
+    }
+
 
     private Object accountSelect(PayDepositReq req){
         ResponseResult result = null;
