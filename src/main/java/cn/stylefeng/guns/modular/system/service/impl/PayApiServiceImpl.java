@@ -44,11 +44,14 @@ public class PayApiServiceImpl implements PayApiService {
     @Autowired
     private RedisDao redisDao;
 
+    private String PAYLINK_PREFIX = "http://localhost:8080/payApi/";
+
 
     @Override
     public Object deposit(PayDepositReq req) {
 
         ResponseResult result = null;
+        String payLink = PAYLINK_PREFIX;
 
         result = (ResponseResult) this.accountSelect(req);
         if(result.getCode()!=BANK_CARD_SELECT_SUC.getCode()){
@@ -60,13 +63,13 @@ public class PayApiServiceImpl implements PayApiService {
         //异步生成订单
 
         this.createOrder(req,orderNo);
-
+        payLink  = payLink + orderNo;
         PayDepositRsp depositRsp = PayDepositRsp.builder()
                 .amount(req.getAmount())
                 .merchant_id(req.getMerchantId())
                 .channel(req.getChannel())
                 .merchant_order_no(req.getMerchantOrderNo())
-                .payUrl("http://xxxxxxxxxxxxxxxxxxxxx")
+                .payUrl(payLink)
                 .platform_order_no(orderNo)
                 .invalidDate(DateUtil.addMinute(new Date(), 10))
                 .build();
