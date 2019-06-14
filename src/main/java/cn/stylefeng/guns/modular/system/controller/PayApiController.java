@@ -25,6 +25,10 @@ import java.util.Map;
 public class PayApiController {
 
 
+    private String PREFIX = "/system/payApi/";
+
+
+
     @Autowired
     private PayApiService payApi;
 
@@ -65,7 +69,7 @@ public class PayApiController {
     @RequestMapping(value = "/counter/{orderNo}")
     @ResponseBody
     public Object counter(@PathVariable String orderNo){
-        return payApi.getDepositDetail(orderNo);
+        return PREFIX+"counter.html";
     }
 
 
