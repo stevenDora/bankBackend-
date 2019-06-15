@@ -3,8 +3,57 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+    <script type="text/javascript" src="/js/common.js"></script>
 </head>
 <body>
 
 </body>
+
+<script>
+
+$(function(){
+
+    var orderNo = g_getQueryString("orderNo");
+    if(orderNo){
+        //查询下单是否成功
+        getDepositResult(orderNo);
+    }
+
+});
+
+function getDepositResult(orderNo){
+    g_showLoading();
+    $.ajax({
+        url:"/payApi/getDepositResult/result",
+        type:"GET",
+        data:{
+            orderNo:orderNo
+        },
+        success:function(data){
+            if(data.code == 0){
+                var result = data.data;
+                if(result == 0){//继续轮询
+                    setTimeout(function(){
+                        getDepositResult(orderNo);
+                    }, 200);
+                }else{
+                    layer.confirm("恭喜你，下单成功！查看订单支付信息？", {btn:["确定","取消"]},
+                        function(){
+                            //根据不同的渠道展示不同的收款账号页面
+                            window.location.href="/bank_deposit_order_detail.htm?orderNo="+result;
+                        },
+                        function(){
+                            layer.closeAll();
+                        });
+                }
+            }else{
+                layer.msg(data.msg);
+            }
+        },
+        error:function(){
+            layer.msg("客户端请求有误");
+        }
+    });
+}
+</script>
 </html>

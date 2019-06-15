@@ -65,11 +65,19 @@ public class PayApiController {
     }
 
 
-    @ApiOperation("跳转支付页面")
+    @ApiOperation("跳转支付收银台页面")
     @RequestMapping(value = "/counter/{orderNo}")
     @ResponseBody
     public Object counter(@PathVariable String orderNo){
-        return PREFIX+"counter.html";
+        return PREFIX+"counter.html?orderNo="+orderNo;
+    }
+
+
+    @ApiOperation("获取下单充值结果")
+    @RequestMapping(value = "/getDepositResult/{orderNo}")
+    @ResponseBody
+    public Object getDepositResult(@PathVariable String orderNo){
+        return payApi.getDepositDetail(orderNo);
     }
 
 
