@@ -3,32 +3,35 @@ package cn.stylefeng.guns.modular.system.service.impl;
 import cn.stylefeng.guns.modular.system.annotate.AccessLimit;
 import cn.stylefeng.guns.modular.system.components.redis.RedisDao;
 import cn.stylefeng.guns.modular.system.constant.PayApiEnum;
-import cn.stylefeng.guns.modular.system.dto.PayDepositReq;
-import cn.stylefeng.guns.modular.system.dto.PayDepositRsp;
-import cn.stylefeng.guns.modular.system.dto.ResponseResult;
-import cn.stylefeng.guns.modular.system.dto.SelectCardReq;
+import cn.stylefeng.guns.modular.system.dto.*;
 import cn.stylefeng.guns.modular.system.model.Trade;
 import cn.stylefeng.guns.modular.system.service.IBankCardService;
+import cn.stylefeng.guns.modular.system.service.IBankRemarkService;
 import cn.stylefeng.guns.modular.system.service.ITradeService;
 import cn.stylefeng.guns.modular.system.service.PayApiService;
 import cn.stylefeng.guns.modular.system.utils.DateUtil;
 import cn.stylefeng.guns.modular.system.utils.StringUtils;
 import cn.stylefeng.roses.kernel.model.exception.ServiceException;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestParam;
 
+import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.Date;
 
-import static cn.stylefeng.guns.modular.system.constant.Constant.OrderStatus.ORDER_DUPLICATE_SUBMIT_MAX;
+import static cn.stylefeng.guns.modular.system.constant.Constant.OrderStatus.*;
+import static cn.stylefeng.guns.modular.system.constant.Constant.RedisOrderPrefix.ORDER_DETAIL;
 import static cn.stylefeng.guns.modular.system.constant.Constant.RedisOrderPrefix.ORDER_DUPLICATE_SUBMIT_CHECK;
 import static cn.stylefeng.guns.modular.system.constant.PayApiEnum.*;
 import static cn.stylefeng.guns.modular.system.constant.Constant.Channel.*;
-import static cn.stylefeng.guns.modular.system.constant.Constant.OrderStatus.ORDER_STATUS_PROCESS;
 import static cn.stylefeng.guns.modular.system.constant.Constant.PushStatus.PUSH_STATUS_UNHANDLE;
 
 
@@ -49,47 +52,60 @@ public class PayApiServiceImpl implements PayApiService {
 
     private String PAYLINK_PREFIX = "http://localhost:8080/payApi/counter/";
 
+    @Autowired
+    private IBankRemarkService bankRemarkService;
 
 /*    @AccessLimit(seconds = 5, maxCount = 5, type = ORDER_DUPLICATE_SUBMIT_CHECK)*/
     @Override
     public Object deposit(PayDepositReq req) {
-
         ResponseResult result = null;
         String payLink = PAYLINK_PREFIX;
+        PayDepositRsp depositRsp = null;
+        try{
+            AccountSelectRsp accountSelectRsp = this.accountSelect(req);
+            //重复提交校验
+            String orderDupKey = req.getMerchantId()+"_"+req.getMerchantOrderNo();
+            Long submit_times = redisDao.incr(ORDER_DUPLICATE_SUBMIT_CHECK, orderDupKey);
+            if(submit_times > ORDER_DUPLICATE_SUBMIT_MAX){
+                logger.info("merchant:{},merchant_order_no:{} submit duplicate..",
+                        req.getMerchantId(),req.getMerchantOrderNo());
 
-        result = (ResponseResult) this.accountSelect(req);
-        if(result.getCode()!=BANK_CARD_SELECT_SUC.getCode()){
-            logger.info("派单失败!! 请求信息："+ req.toString());
-            return result;
+                return ResponseResult.builder()
+                        .data(null)
+                        .code(PayApiEnum.DEPOSIT_FAILED_MERCHANT_REPEAT_SUBMIT.getCode())
+                        .msg(PayApiEnum.DEPOSIT_FAILED_MERCHANT_REPEAT_SUBMIT.getDesc()).build();
+            }
+            //生成订单id
+            String orderNo = getOrderNo(req);
+
+            //缓存订单
+            Trade trade = initOrder(req,orderNo,accountSelectRsp);
+            String order_detail_key = ORDER_DETAIL + orderNo;
+            redisDao.set(order_detail_key, JSONObject.toJSONString(trade));
+            redisDao.expire(order_detail_key,30*60);
+
+            //异步入库
+            this.createOrder(trade);
+            payLink  = payLink + orderNo;
+            depositRsp = PayDepositRsp.builder()
+                    .amount(req.getAmount())
+                    .merchant_id(req.getMerchantId())
+                    .channel(req.getChannel())
+                    .merchant_order_no(req.getMerchantOrderNo())
+                    .payUrl(payLink)
+                    .platform_order_no(orderNo)
+                    .invalidDate(DateUtil.addMinute(new Date(), 10))
+                    .build();
+        }catch (ServiceException e){
+            e.printStackTrace();
+            if(e.getCode() == GENERATION_ORDER_NO_FAILED.getCode()){
+                throw new ServiceException(GENERATION_ORDER_NO_FAILED);
+            }
+            else {
+                throw new ServiceException(DEPOSIT_FAILED_UNKNOW);
+            }
+
         }
-        //重复提交校验
-        String orderDupKey = req.getMerchantId()+"_"+req.getMerchantOrderNo();
-        Long submit_times = redisDao.incr(ORDER_DUPLICATE_SUBMIT_CHECK, orderDupKey);
-        if(submit_times > ORDER_DUPLICATE_SUBMIT_MAX){
-            logger.info("merchant:{},merchant_order_no:{} submit duplicate..",
-                    req.getMerchantId(),req.getMerchantOrderNo());
-
-            return ResponseResult.builder()
-                    .data(null)
-                    .code(PayApiEnum.DEPOSIT_FAILED_MERCHANT_REPEAT_SUBMIT.getCode())
-                    .msg(PayApiEnum.DEPOSIT_FAILED_MERCHANT_REPEAT_SUBMIT.getDesc()).build();
-        }
-        //生成订单id
-        String orderNo = getOrderNo(req);
-        //异步生成订单
-
-        this.createOrder(req,orderNo);
-        payLink  = payLink + orderNo;
-        PayDepositRsp depositRsp = PayDepositRsp.builder()
-                .amount(req.getAmount())
-                .merchant_id(req.getMerchantId())
-                .channel(req.getChannel())
-                .merchant_order_no(req.getMerchantOrderNo())
-                .payUrl(payLink)
-                .platform_order_no(orderNo)
-                .invalidDate(DateUtil.addMinute(new Date(), 10))
-                .build();
-
         return ResponseResult.builder()
                 .data(depositRsp)
                 .code(PayApiEnum.DEPOSIT_APPLY_SUCCESS.getCode())
@@ -97,10 +113,8 @@ public class PayApiServiceImpl implements PayApiService {
     }
 
 
-    @Async
-    @Transactional
-    @Override
-    public void createOrder(PayDepositReq req,String orderNo){
+
+    private Trade initOrder(PayDepositReq req,String orderNo,AccountSelectRsp rsp){
         Trade trade = Trade.builder()
                 .applyAmount(req.getAmount())
                 .actualAmount(new BigDecimal(0))
@@ -111,34 +125,101 @@ public class PayApiServiceImpl implements PayApiService {
                 .orderNo(orderNo)
                 .pushTime(null)
                 .arriveTime(null)
+                .remark(rsp.getRemark())
                 .serviceFee(new BigDecimal(0))
-                .orderStatus(ORDER_STATUS_PROCESS)
-                .pushStatus(PUSH_STATUS_UNHANDLE).build();
+                .orderStatus(ORDER_STATUS_INIT)
+                .pushStatus(PUSH_STATUS_UNHANDLE)
+                .accountId(rsp.getAccount_id())
+                .accountInfo(rsp.getAccount_info()).build();
+
+        return trade;
+    }
+
+    @Async
+    @Transactional
+    @Override
+    public void createOrder(Trade trade){
+        trade.setOrderStatus(ORDER_STATUS_PROCESS);
         tradeService.insert(trade);
     }
 
     @Override
-    public Object getDepositDetail(String orderNo) {
-        return null;
+    public Object getDepositDetail(String orderNo){
+        String tradeStr = redisDao.get(orderNo);
+        if(StringUtils.isEmpty(tradeStr)){
+            //订单不存在
+            return ResponseResult.builder()
+                    .data(null)
+                    .code(DEPOSIT_FAILED_ORDER_NOT_EXIST.getCode())
+                    .msg(DEPOSIT_FAILED_ORDER_NOT_EXIST.getDesc()).build();
+        }
+        Trade trade = JSONObject.parseObject(tradeStr, Trade.class);
+
+        return ResponseResult.builder().data(DepositAccountDetailRsp.builder().
+                channel(trade.getChannel())
+                .orderNo(trade.getOrderNo())
+                .account(trade.getAccountInfo())
+                .remark(trade.getRemark()).build())
+                .code(DEPOSIT_FAILED_ORDER_NOT_EXIST.getCode())
+                .msg(DEPOSIT_FAILED_ORDER_NOT_EXIST.getDesc()).build();
     }
 
 
-    private Object accountSelect(PayDepositReq req){
+    @Override
+    public Object getDepositResult(String orderNo) {
+        String tradeStr = redisDao.get(orderNo);
+        if(StringUtils.isEmpty(tradeStr)){
+            //订单不存在
+            return ResponseResult.builder()
+                    .data(null)
+                    .code(DEPOSIT_FAILED_ORDER_NOT_EXIST.getCode())
+                    .msg(DEPOSIT_FAILED_ORDER_NOT_EXIST.getDesc()).build();
+        }
+
+        Trade trade = JSONObject.parseObject(tradeStr, Trade.class);
+        return ResponseResult.builder()
+                .data(DepositApplyResult.builder()
+                        .orderNo(trade.getOrderNo())
+                        .channel(trade.getChannel())
+                        .orderStatus(trade.getOrderStatus()).build())
+                .code(DEPOSIT_APPLY_SUCCESS.getCode())
+                .msg(DEPOSIT_APPLY_SUCCESS.getDesc()).build();
+    }
+
+
+    private AccountSelectRsp accountSelect(PayDepositReq req){
         ResponseResult result = null;
-
+        String account_info = "";
+        AccountSelectRsp accountSelectRsp = AccountSelectRsp.builder().build();
         if(req.getChannel()== CHANNEL_ALIPAY){
-
+            account_info = "";
         }
         else if(req.getChannel()== CHANNEL_WXCHAT){
-
+            account_info = "";
         }
-        if(req.getChannel()== CHANNEL_BANK){
+        else if(req.getChannel()== CHANNEL_BANK){
             SelectCardReq selectCardReq = SelectCardReq.builder()
                     .amount(req.getAmount()).build();
             result = (ResponseResult) bankCardService.bankSelect(selectCardReq);
-        }
+            if(result.getCode()==BANK_CARD_SELECT_SUC.getCode()){
+                SelectCardRsp data = (SelectCardRsp) result.getData();
+                account_info = data.getName()+"#"+data.getCardNo();
+                accountSelectRsp.setAccount_id(data.getAccount_id());
+            }
 
-        return result;
+        }
+        if(StringUtils.isEmpty(account_info)){
+            throw new ServiceException(ACCOUNT_SELECT_FAILED);
+        }
+        //2)生成附言
+        accountSelectRsp.setRemark(bankRemarkService.genRemark());
+
+        //3)填充其他信息
+        accountSelectRsp.setChannel(req.getChannel());
+        accountSelectRsp.setAmount(req.getAmount());
+        accountSelectRsp.setAccount_info(account_info);
+        result.setData(accountSelectRsp);
+        return accountSelectRsp;
     }
 
 
@@ -149,6 +230,8 @@ public class PayApiServiceImpl implements PayApiService {
         }
         return req.getMerchantId()+"@" + orderNo;
     }
+
+
 
 
 }

@@ -24,15 +24,16 @@ $(function(){
 function getDepositResult(orderNo){
     g_showLoading();
     $.ajax({
-        url:"/payApi/getDepositResult/result",
-        type:"GET",
+        url:"/payApi/getDepositResult",
+        type:"POST",
         data:{
             orderNo:orderNo
         },
         success:function(data){
-            if(data.code == 0){
-                var result = data.data;
-                if(result == 0){//继续轮询
+            if(data.code == 200){
+                var orderInfo = data.data;
+                var orderStatus = orderInfo.orderStatus;
+                if(orderStatus == 0){//继续轮询
                     setTimeout(function(){
                         getDepositResult(orderNo);
                     }, 200);
@@ -40,7 +41,15 @@ function getDepositResult(orderNo){
                     layer.confirm("恭喜你，下单成功！查看订单支付信息？", {btn:["确定","取消"]},
                         function(){
                             //根据不同的渠道展示不同的收款账号页面
-                            window.location.href="/bank_deposit_order_detail.htm?orderNo="+result;
+                            if(orderInfo.channel == 1){
+                                window.location.href="/alipay_deposit_order_detail.htm?orderNo="+orderNo;
+                            }else if(orderInfo.channel == 2){
+                                window.location.href="/wx_deposit_order_detail.htm?orderNo="+orderNo;
+                            }else if(orderInfo.channel == 3){
+                                window.location.href="/bank_deposit_order_detail.htm?orderNo="+orderNo;
+                            }else {
+                                layer.msg("渠道错误");
+                            }
                         },
                         function(){
                             layer.closeAll();

@@ -47,9 +47,6 @@ public class BankCardServiceImpl extends ServiceImpl<BankCardMapper, BankCard> i
     private BankFlowMapper bankFlowMapper;
 
     @Resource
-    private IBankRemarkService bankRemarkService;
-
-    @Resource
     private RedisDao redisDao;
 
     @Override
@@ -96,21 +93,15 @@ public class BankCardServiceImpl extends ServiceImpl<BankCardMapper, BankCard> i
 
         if(null == matchedCard){
             //选卡失败,无可用的卡
-            ResponseResult errorTip = new ResponseResult(400, "");
-            errorTip.setCode(BANK_CARD_SELECT_FAILED_NOT_ENOUGH.getCode());
-            errorTip.setMsg(BANK_CARD_SELECT_FAILED_NOT_ENOUGH.getDesc());
-            return errorTip;
+            throw new ServiceException(BANK_CARD_SELECT_FAILED_NOT_ENOUGH);
         }
-        //2)生成附言
-        String remark = bankRemarkService.genRemark();
-
         SelectCardRsp rsp = SelectCardRsp.builder()
                 .cardNo(matchedCard.getCardNo())
                 .bankCode(matchedCard.getBankCode())
                 .amount(req.getAmount())
                 .address(matchedCard.getAddress())
                 .name(matchedCard.getName())
-                .remark(remark).build();
+                .remark("").build();
 
         return ResponseResult.builder()
                 .data(rsp).code(BANK_CARD_SELECT_SUC.getCode())

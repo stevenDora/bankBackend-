@@ -20,5 +20,5 @@ public class SelectCardRsp {
     private String address;
     private String bankCode;
     private String bankName;
-
+    private Long account_id;
 }

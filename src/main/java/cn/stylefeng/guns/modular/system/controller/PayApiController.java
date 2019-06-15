@@ -14,6 +14,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -74,17 +75,17 @@ public class PayApiController {
 
 
     @ApiOperation("获取下单充值结果")
-    @RequestMapping(value = "/getDepositResult/{orderNo}")
+    @RequestMapping(value = "/getDepositResult")
     @ResponseBody
-    public Object getDepositResult(@PathVariable String orderNo){
-        return payApi.getDepositDetail(orderNo);
+    public Object getDepositResult(@RequestParam String orderNo){
+        return payApi.getDepositResult(orderNo);
     }
 
 
-    @ApiOperation("获取支付信息")
+    @ApiOperation("获取支付详细信息")
     @RequestMapping(value = "/getDepositDetail/{orderNo}")
     @ResponseBody
-    public Object getDepositDetail(@PathVariable String orderNo){
+    public Object getDepositDetail(@RequestParam("orderNo") String orderNo){
         return payApi.getDepositDetail(orderNo);
     }
 

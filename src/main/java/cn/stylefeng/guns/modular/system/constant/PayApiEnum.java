@@ -35,7 +35,10 @@ public enum PayApiEnum implements AbstractBaseExceptionEnum {
     GENERATION_ORDER_NO_FAILED(472,"生成平台订单号失败！！"),
     DEPOSIT_FAILED_SIGN(473,"充值申请失败,验签失败！！"),
     DEPOSIT_FAILED_INPUT_PARAMETERS(474,"生成平台订单号失败请求参数有误！！"),
+    ACCOUNT_SELECT_FAILED(475,"账号选择失败!!"),
     DEPOSIT_FAILED_MERCHANT_REPEAT_SUBMIT(478,"相同商户订单号重复提交！！"),
+    DEPOSIT_FAILED_ORDER_NOT_EXIST(479,"充值失败，订单不存在！！"),
+    DEPOSIT_FAILED_UNKNOW(485,"充值失败，未知错误！！"),
     DEPOSIT_APPLY_SUCCESS(200,"申请充值成功！！");
 
 

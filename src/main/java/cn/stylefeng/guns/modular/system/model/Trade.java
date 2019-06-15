@@ -37,6 +37,19 @@ public class Trade extends Model<Trade> {
      */
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
+
+    /**
+    *  账号Id
+    */
+    @TableField(value = "account_id")
+    private Long accountId;
+
+    /**
+     *  账号详情 冗余字段
+     */
+    @TableField(value = "account_info")
+    private String accountInfo;
+
     /**
      * 平台订单号
      */
@@ -102,6 +115,11 @@ public class Trade extends Model<Trade> {
      */
     @TableField("push_status")
     private Integer pushStatus;
+    /**
+     * 附言
+     */
+    @TableField("remark")
+    private String remark;
     /**
      * 创建时间
      */

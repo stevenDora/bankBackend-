@@ -29,7 +29,7 @@ public class PayDepositReq {
 
     @NotNull(message = "渠道编码不能为空！")
     @JSONField(name = "channel")
-    private Byte channel;
+    private Integer channel;
 
     @NotNull(message = "api版本号不能为空！")
     @JSONField(name = "api_version")

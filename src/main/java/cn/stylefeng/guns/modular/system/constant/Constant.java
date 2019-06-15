@@ -27,18 +27,20 @@ public class Constant {
     }
 
     public interface Channel{
-        Byte CHANNEL_ALIPAY = 1;
-        Byte CHANNEL_WXCHAT = 2;
-        Byte CHANNEL_BANK = 3;
+        Integer CHANNEL_ALIPAY = 1;
+        Integer CHANNEL_WXCHAT = 2;
+        Integer CHANNEL_BANK = 3;
     }
 
     public interface RedisOrderPrefix {
-        String PLATFORM_SYSTEM_ORDER_NO = "platform_system_order_no";
-        String ORDER_DUPLICATE_SUBMIT_CHECK = "order_dup_submit_check";
+        String PLATFORM_SYSTEM_ORDER_NO = "platform_system_order_no:";
+        String ORDER_DUPLICATE_SUBMIT_CHECK = "order_dup_submit_check:";
+        String ORDER_DETAIL = "order_detail:";
     }
 
     public interface OrderStatus{
         Integer ORDER_DUPLICATE_SUBMIT_MAX = 1;
+        Integer ORDER_STATUS_INIT = 0;
         Integer ORDER_STATUS_PROCESS = 1;
         Integer ORDER_STATUS_SUCCESS = 2;
         Integer ORDER_STATUS_OVERDUE = 3;
