@@ -40,7 +40,7 @@ public class Constant {
 
     public interface OrderStatus{
         Integer ORDER_DUPLICATE_SUBMIT_MAX = 1;
-        Integer ORDER_STATUS_INIT = 0;
+        Integer ORDER_STATUS_PENDING = 0;
         Integer ORDER_STATUS_PROCESS = 1;
         Integer ORDER_STATUS_SUCCESS = 2;
         Integer ORDER_STATUS_OVERDUE = 3;

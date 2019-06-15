@@ -127,7 +127,7 @@ public class PayApiServiceImpl implements PayApiService {
                 .arriveTime(null)
                 .remark(rsp.getRemark())
                 .serviceFee(new BigDecimal(0))
-                .orderStatus(ORDER_STATUS_INIT)
+                .orderStatus(ORDER_STATUS_PENDING)
                 .pushStatus(PUSH_STATUS_UNHANDLE)
                 .accountId(rsp.getAccount_id())
                 .accountInfo(rsp.getAccount_info()).build();
