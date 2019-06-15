@@ -1,5 +1,6 @@
 package cn.stylefeng.guns.modular.system.service.impl;
 
+import cn.stylefeng.guns.modular.system.annotate.AccessLimit;
 import cn.stylefeng.guns.modular.system.components.redis.RedisDao;
 import cn.stylefeng.guns.modular.system.constant.PayApiEnum;
 import cn.stylefeng.guns.modular.system.dto.PayDepositReq;
@@ -23,6 +24,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.util.Date;
 
+import static cn.stylefeng.guns.modular.system.constant.Constant.OrderStatus.ORDER_DUPLICATE_SUBMIT_MAX;
+import static cn.stylefeng.guns.modular.system.constant.Constant.RedisOrderPrefix.ORDER_DUPLICATE_SUBMIT_CHECK;
 import static cn.stylefeng.guns.modular.system.constant.PayApiEnum.*;
 import static cn.stylefeng.guns.modular.system.constant.Constant.Channel.*;
 import static cn.stylefeng.guns.modular.system.constant.Constant.OrderStatus.ORDER_STATUS_PROCESS;
@@ -47,6 +50,7 @@ public class PayApiServiceImpl implements PayApiService {
     private String PAYLINK_PREFIX = "http://localhost:8080/payApi/counter/";
 
 
+/*    @AccessLimit(seconds = 5, maxCount = 5, type = ORDER_DUPLICATE_SUBMIT_CHECK)*/
     @Override
     public Object deposit(PayDepositReq req) {
 
@@ -57,6 +61,18 @@ public class PayApiServiceImpl implements PayApiService {
         if(result.getCode()!=BANK_CARD_SELECT_SUC.getCode()){
             logger.info("派单失败!! 请求信息："+ req.toString());
             return result;
+        }
+        //重复提交校验
+        String orderDupKey = req.getMerchantId()+"_"+req.getMerchantOrderNo();
+        Long submit_times = redisDao.incr(ORDER_DUPLICATE_SUBMIT_CHECK, orderDupKey);
+        if(submit_times > ORDER_DUPLICATE_SUBMIT_MAX){
+            logger.info("merchant:{},merchant_order_no:{} submit duplicate..",
+                    req.getMerchantId(),req.getMerchantOrderNo());
+
+            return ResponseResult.builder()
+                    .data(null)
+                    .code(PayApiEnum.DEPOSIT_FAILED_MERCHANT_REPEAT_SUBMIT.getCode())
+                    .msg(PayApiEnum.DEPOSIT_FAILED_MERCHANT_REPEAT_SUBMIT.getDesc()).build();
         }
         //生成订单id
         String orderNo = getOrderNo(req);

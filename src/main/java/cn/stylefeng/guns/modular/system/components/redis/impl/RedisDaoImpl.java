@@ -203,7 +203,7 @@ public class RedisDaoImpl implements RedisDao {
     public String getOrderNo() {
         return DateUtil.getFormatDate(new Date(), "yyyyMMddHHmmss")
                 + "00"
-                + this.incr(Constant.OrderPrefix.PLATFORM_SYSTEM_ORDER_NO,"");
+                + this.incr(Constant.RedisOrderPrefix.PLATFORM_SYSTEM_ORDER_NO,"");
     }
 
 }

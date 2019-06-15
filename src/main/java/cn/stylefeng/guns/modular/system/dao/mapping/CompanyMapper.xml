@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="cn.stylefeng.guns.modular.system.dao.CompanyMapper">
-    <select id="getCompany" resultType="com.dora.counter.domain.CompanyDo">
+    <select id="getCompany" resultType="cn.stylefeng.guns.modular.system.model.CompanyDo">
         select id,address,charge,fix_phone,company_name,company_code,freezing_amount,
         available_amount,total_amount,email,website,status,crt_time,
         upt_time,note,if_rate,private_key
