@@ -1,6 +1,7 @@
 package cn.stylefeng.guns.modular.system.components.rabbitmq;
 
 import cn.stylefeng.guns.modular.system.components.redis.RedisDao;
+import cn.stylefeng.guns.modular.system.constant.Constant;
 import cn.stylefeng.guns.modular.system.dto.*;
 import cn.stylefeng.guns.modular.system.model.Trade;
 import cn.stylefeng.guns.modular.system.service.IBankCardService;
@@ -31,6 +32,7 @@ import static cn.stylefeng.guns.modular.system.constant.Constant.OrderStatus.ORD
 import static cn.stylefeng.guns.modular.system.constant.Constant.orderRoute.CREATE_ORDER;
 import static cn.stylefeng.guns.modular.system.constant.PayApiEnum.ACCOUNT_SELECT_FAILED;
 import static cn.stylefeng.guns.modular.system.constant.PayApiEnum.BANK_CARD_SELECT_SUC;
+import static cn.stylefeng.guns.modular.system.constant.PayApiEnum.MSG_COMMUNICATE_ERROR;
 
 /**
  * @author Administrator
@@ -54,10 +56,14 @@ public class ReceiveHandler {
         Integer op =(Integer)map.get("op");
         String orderNo = (String) map.get("orderNo");
 
-        if(op == CREATE_ORDER){
-            //创建订单
+        if(StringUtils.isEmpty(op)
+                ||StringUtils.isEmpty(orderNo))
+            throw new ServiceException(MSG_COMMUNICATE_ERROR);
+
+        if(op==CREATE_ORDER){
             tradeService.createOrder(orderNo);
         }
+
     }
 
 
