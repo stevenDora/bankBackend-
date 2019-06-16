@@ -9,6 +9,8 @@ import org.springframework.boot.autoconfigure.amqp.SimpleRabbitListenerContainer
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import static cn.stylefeng.guns.modular.system.constant.Constant.MessageRoute.MSG_ROUTE_ORDER;
+
 /**
  * @author Administrator
  * @version 1.0
@@ -23,8 +25,6 @@ public class RabbitMQConfig {
     public static final String QUEUE_ORDER_PROCESS = "queue_order_process";
 
     //路由
-    @Value("${routingkey_create_order}")
-    public  String routingkey_create_order;
 
     //消费者并发数量
     public static final int DEFAULT_CONCURRENT = 10;
@@ -60,7 +60,7 @@ public class RabbitMQConfig {
      */
     @Bean
     public Binding binding_queue_order_processtask(@Qualifier("QUEUE_ORDER_PROCESS") Queue queue, @Qualifier(EX_PROCESSTASK) Exchange exchange) {
-        return BindingBuilder.bind(queue).to(exchange).with(routingkey_create_order).noargs();
+        return BindingBuilder.bind(queue).to(exchange).with(MSG_ROUTE_ORDER).noargs();
     }
 }
 
