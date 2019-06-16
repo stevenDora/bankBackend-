@@ -51,4 +51,9 @@ public class Constant {
         Integer PUSH_STATUS_SUCCESS = 2;
     }
 
+
+    public interface MessageRoute{
+        String MSG_ORDER_CREATE = "MSG_ORDER_CREATE";
+    }
+
 }

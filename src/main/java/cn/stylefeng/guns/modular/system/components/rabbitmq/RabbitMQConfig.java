@@ -1,66 +1,66 @@
 package cn.stylefeng.guns.modular.system.components.rabbitmq;
 
 import org.springframework.amqp.core.*;
+import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
+import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.amqp.SimpleRabbitListenerContainerFactoryConfigurer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+/**
+ * @author Administrator
+ * @version 1.0
+ * @create 2018-07-12 9:04
+ **/
 @Configuration
 public class RabbitMQConfig {
-    //添加选课任务交换机
-    public static final String EX_LEARNING_ADDCHOOSECOURSE = "ex_learning_addchoosecourse";
 
-    //完成添加选课消息队列
-    public static final String XC_LEARNING_FINISHADDCHOOSECOURSE = "xc_learning_finishaddchoosecourse";
+    public static final String EX_PROCESSTASK = "ex_processor";
 
-    //添加选课消息队列
-    public static final String XC_LEARNING_ADDCHOOSECOURSE = "xc_learning_addchoosecourse";
+    //处理队列
+    public static final String QUEUE_ORDER_PROCESS = "queue_order_process";
 
-    //添加选课路由key
-    public static final String XC_LEARNING_ADDCHOOSECOURSE_KEY = "addchoosecourse";
-    //完成添加选课路由key
-    public static final String XC_LEARNING_FINISHADDCHOOSECOURSE_KEY = "finishaddchoosecourse";
+    //路由
+    @Value("${routingkey_create_order}")
+    public  String routingkey_create_order;
+
+    //消费者并发数量
+    public static final int DEFAULT_CONCURRENT = 10;
+
+    @Bean("customContainerFactory")
+    public SimpleRabbitListenerContainerFactory containerFactory(SimpleRabbitListenerContainerFactoryConfigurer configurer, ConnectionFactory connectionFactory) {
+        SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
+        factory.setConcurrentConsumers(DEFAULT_CONCURRENT);
+        factory.setMaxConcurrentConsumers(DEFAULT_CONCURRENT);
+        configurer.configure(factory, connectionFactory);
+        return factory;
+    }
 
     /**
      * 交换机配置
      * @return the exchange
      */
-    @Bean(EX_LEARNING_ADDCHOOSECOURSE)
-    public Exchange EX_DECLARE() {
-        return ExchangeBuilder.directExchange(EX_LEARNING_ADDCHOOSECOURSE).durable(true).build();
+    @Bean(EX_PROCESSTASK)
+    public Exchange EX_MEDIA_VIDEOTASK() {
+        return ExchangeBuilder.directExchange(EX_PROCESSTASK).durable(true).build();
     }
-    //声明队列完成添加选课队列
-    @Bean(XC_LEARNING_FINISHADDCHOOSECOURSE)
-    public Queue QUEUE_DECLARE() {
-        Queue queue = new Queue(XC_LEARNING_FINISHADDCHOOSECOURSE,true,false,true);
-        return queue;
-    }
-
-    //声明队列 添加选课队列
-    @Bean(XC_LEARNING_ADDCHOOSECOURSE)
-    public Queue QUEUE_DECLARE_2() {
-        Queue queue = new Queue(XC_LEARNING_ADDCHOOSECOURSE,true,false,true);
+    //声明队列
+    @Bean("QUEUE_ORDER_PROCESS")
+    public Queue QUEUE_PROCESSTASK() {
+        Queue queue = new Queue(QUEUE_ORDER_PROCESS,true,false,true);
         return queue;
     }
     /**
-     * 绑定完成添加选课队列到交换机 .
+     * 绑定队列到交换机 .
      * @param queue    the queue
      * @param exchange the exchange
      * @return the binding
      */
     @Bean
-    public Binding binding_finishaddchoose_processtask(@Qualifier("xc_learning_finishaddchoosecourse") Queue queue, @Qualifier(EX_LEARNING_ADDCHOOSECOURSE) Exchange exchange) {
-        return BindingBuilder.bind(queue).to(exchange).with(XC_LEARNING_FINISHADDCHOOSECOURSE_KEY).noargs();
+    public Binding binding_queue_order_processtask(@Qualifier("QUEUE_ORDER_PROCESS") Queue queue, @Qualifier(EX_PROCESSTASK) Exchange exchange) {
+        return BindingBuilder.bind(queue).to(exchange).with(routingkey_create_order).noargs();
     }
-    /**
-     * 绑定添加选课队列到交换机 .
-     * @param queue    the queue
-     * @param exchange the exchange
-     * @return the binding
-     */
-    @Bean
-    public Binding binding_addchoose_processtask(@Qualifier("xc_learning_addchoosecourse") Queue queue, @Qualifier(EX_LEARNING_ADDCHOOSECOURSE) Exchange exchange) {
-        return BindingBuilder.bind(queue).to(exchange).with(XC_LEARNING_ADDCHOOSECOURSE_KEY).noargs();
-    }
-
 }
+
