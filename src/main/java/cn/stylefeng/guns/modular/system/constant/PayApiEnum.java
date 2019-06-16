@@ -40,7 +40,7 @@ public enum PayApiEnum implements AbstractBaseExceptionEnum {
     DEPOSIT_FAILED_ORDER_NOT_EXIST(479,"充值失败，订单不存在！！"),
     DEPOSIT_FAILED_UNKNOW(485,"充值失败，未知错误！！"),
     DEPOSIT_FAILED_CREATE_ORDER_MSG_SUBMIT(486,"发送下单失败！！"),
-    UN_KNOW_ERROR(487,"为止错误！！"),
+    UN_KNOW_ERROR(487,"未知错误！！"),
     DEPOSIT_APPLY_SUCCESS(200,"申请充值成功！！");
 
 
