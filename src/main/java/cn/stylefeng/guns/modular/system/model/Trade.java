@@ -125,6 +125,13 @@ public class Trade extends Model<Trade> {
      */
     @TableField("crt_time")
     private Date crtTime;
+
+    /**
+     * 创建时间
+     */
+    @TableField("overDue_time")
+    private Date overDueTime;
+
     /**
      * 最后一次更新时间
      */

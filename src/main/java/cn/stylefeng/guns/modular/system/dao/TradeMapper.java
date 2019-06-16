@@ -12,5 +12,5 @@ import com.baomidou.mybatisplus.mapper.BaseMapper;
  * @since 2019-06-13
  */
 public interface TradeMapper extends BaseMapper<Trade> {
-
+    Trade selectTradeByOrderNo(String orderNo);
 }

@@ -25,34 +25,57 @@
         <td>商品图片</td>  
         <td colspan="2"><img  id="goodsImg" width="200" height="200" /></td>  
      </tr>-->
+      <tr>
+          <td>订单号</td>
+          <td colspan="2"  id="orderNo"></td>
+      </tr>
       <tr>  
-        <td>订单价格</td>  
-        <td colspan="2"  id="orderPrice"></td>  
+        <td>充值金额</td>
+        <td bgcolor="#00FF00" colspan="2"  id="amount"></td>
      </tr>
+      <tr>
+          <td>订单状态</td>
+          <td id="orderStatus">
+              <!--        <td>
+                          <button class="btn btn-primary btn-block" type="submit" id="payButton">立即支付</button>
+                      </td>-->
+      </tr>
+      <tr>
+          <td>附言</td>
+          <td id="remark"></td>
+      </tr>
+      <tr>
+          <td>姓名</td>
+          <td id="name"></td>
+      </tr>
+      <tr>
+          <td>卡号</td>
+          <td id="cardNo"></td>
+      </tr>
      <tr>
-     		<td>下单时间</td>  
-        	<td id="createDate" colspan="2"></td>  
+     	<td>下单时间</td>
+        <td id="createDate" colspan="2"></td>
      </tr>
-     <tr>
-     	<td>订单状态</td>  
-        <td id="orderStatus">
-        </td>  
-<!--        <td>
-        	<button class="btn btn-primary btn-block" type="submit" id="payButton">立即支付</button>
-        </td>-->
-     </tr>
+      <tr>
+          <td>订单过期时间</td>
+          <td bgcolor="#FF0000" id="overDueDate" colspan="2"></td>
+      </tr>
+
   </table>
 </div>
 </body>
 </html>
 <script>
 function render(detail){
-	var goods = detail.goods;
-	var order = detail.order;
-	$("#goodsName").text(goods.goodsName);
-	$("#goodsImg").attr("src", goods.goodsImg);
-	$("#orderPrice").text(order.goodsPrice);
+	var order = detail;
+    $("#orderNo").text(order.orderNo);
+/*	$("#goodsImg").attr("src", goods.goodsImg);*/
+	$("#amount").text(order.amount);
+    $("#name").text(order.name);
+    $("#account").text(order.account);
+    $("#remark").text(order.remark);
 	$("#createDate").text(new Date(order.createDate).format("yyyy-MM-dd hh:mm:ss"));
+    $("#overDueDate").text(new Date(order.overDueDate).format("yyyy-MM-dd hh:mm:ss"));
 	var status = "";
 	if(order.status == 0){
 		status = "未支付"
@@ -76,7 +99,7 @@ function getDepositDetail(){
 			orderId:orderId
 		},
 		success:function(data){
-			if(data.code == 0){
+			if(data.code == 200){
 				render(data.data);
 			}else{
 				layer.msg(data.msg);

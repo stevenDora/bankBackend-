@@ -14,6 +14,7 @@ import cn.stylefeng.guns.modular.system.utils.StringUtils;
 import cn.stylefeng.roses.kernel.model.exception.ServiceException;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -148,7 +149,8 @@ public class PayApiServiceImpl implements PayApiService {
         String tradeStr = redisDao.get(orderNo);
         if(StringUtils.isEmpty(tradeStr)){
             //订单不存在
-            return ResponseResult.builder()
+            if (syncTradeToRedis(orderNo))
+                return ResponseResult.builder()
                     .data(null)
                     .code(DEPOSIT_FAILED_ORDER_NOT_EXIST.getCode())
                     .msg(DEPOSIT_FAILED_ORDER_NOT_EXIST.getDesc()).build();
@@ -159,9 +161,11 @@ public class PayApiServiceImpl implements PayApiService {
                 channel(trade.getChannel())
                 .orderNo(trade.getOrderNo())
                 .account(trade.getAccountInfo())
-                .remark(trade.getRemark()).build())
-                .code(DEPOSIT_FAILED_ORDER_NOT_EXIST.getCode())
-                .msg(DEPOSIT_FAILED_ORDER_NOT_EXIST.getDesc()).build();
+                .remark(trade.getRemark())
+                .createDate(trade.getCrtTime())
+                .overDueDate(trade.getOverDueTime()).build())
+                .code(DEPOSIT_APPLY_SUCCESS.getCode())
+                .msg(DEPOSIT_APPLY_SUCCESS.getDesc()).build();
     }
 
 
@@ -170,7 +174,8 @@ public class PayApiServiceImpl implements PayApiService {
         String tradeStr = redisDao.get(orderNo);
         if(StringUtils.isEmpty(tradeStr)){
             //订单不存在
-            return ResponseResult.builder()
+            if (syncTradeToRedis(orderNo))
+                return ResponseResult.builder()
                     .data(null)
                     .code(DEPOSIT_FAILED_ORDER_NOT_EXIST.getCode())
                     .msg(DEPOSIT_FAILED_ORDER_NOT_EXIST.getDesc()).build();
@@ -184,6 +189,18 @@ public class PayApiServiceImpl implements PayApiService {
                         .orderStatus(trade.getOrderStatus()).build())
                 .code(DEPOSIT_APPLY_SUCCESS.getCode())
                 .msg(DEPOSIT_APPLY_SUCCESS.getDesc()).build();
+    }
+
+    private boolean syncTradeToRedis(String orderNo) {
+        Trade trade = tradeService.selectTradeByOrderNo(orderNo);
+        if (null == trade) {
+            redisDao.set(orderNo, "订单不存在");
+            //防止redis穿透
+            redisDao.expire(orderNo, 5 * 60);
+            return true;
+        }
+        redisDao.set(orderNo, JSONObject.toJSONString(trade));
+        return false;
     }
 
 

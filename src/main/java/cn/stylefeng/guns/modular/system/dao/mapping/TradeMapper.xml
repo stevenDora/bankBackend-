@@ -24,4 +24,13 @@
         id, order_no, company_no, company_order_no, apply_amount, actual_amount, service_fee, order_status, arrive_time, push_time, push_status, crt_time, upt_time
     </sql>
 
+    <select id="selectTradeByOrderNo" resultType="cn.stylefeng.guns.modular.system.model.Trade">
+        select
+        <include refid="Base_Column_List" />
+        from trade
+        where order_no = #{orderNo}
+    </select>
+
+
+
 </mapper>
