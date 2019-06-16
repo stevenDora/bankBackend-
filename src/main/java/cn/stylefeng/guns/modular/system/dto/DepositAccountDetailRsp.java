@@ -20,7 +20,7 @@ public class DepositAccountDetailRsp {
     private Integer channel;
     private String account;
     private String name;
-    private String qrCode;
+/*    private String qrCode;*/
     private Date createDate;
     private Date overDueDate;
 }

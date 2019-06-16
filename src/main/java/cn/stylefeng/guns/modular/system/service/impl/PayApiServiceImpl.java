@@ -63,7 +63,6 @@ public class PayApiServiceImpl implements PayApiService {
         String payLink = PAYLINK_PREFIX;
         PayDepositRsp depositRsp = null;
         try{
-            AccountSelectRsp accountSelectRsp = this.accountSelect(req);
             //重复提交校验
             String orderDupKey = req.getMerchantId()+"_"+req.getMerchantOrderNo();
             Long submit_times = redisDao.incr(ORDER_DUPLICATE_SUBMIT_CHECK, orderDupKey);
@@ -76,6 +75,7 @@ public class PayApiServiceImpl implements PayApiService {
                         .code(PayApiEnum.DEPOSIT_FAILED_MERCHANT_REPEAT_SUBMIT.getCode())
                         .msg(PayApiEnum.DEPOSIT_FAILED_MERCHANT_REPEAT_SUBMIT.getDesc()).build();
             }
+            AccountSelectRsp accountSelectRsp = this.accountSelect(req);
             //生成订单id
             String orderNo = getOrderNo(req);
 
@@ -150,20 +150,27 @@ public class PayApiServiceImpl implements PayApiService {
         if(StringUtils.isEmpty(tradeStr)){
             //订单不存在
             if (syncTradeToRedis(orderNo))
-                return ResponseResult.builder()
-                    .data(null)
-                    .code(DEPOSIT_FAILED_ORDER_NOT_EXIST.getCode())
-                    .msg(DEPOSIT_FAILED_ORDER_NOT_EXIST.getDesc()).build();
+                throw new ServiceException(DEPOSIT_FAILED_ORDER_NOT_EXIST);
         }
         Trade trade = JSONObject.parseObject(tradeStr, Trade.class);
-
-        return ResponseResult.builder().data(DepositAccountDetailRsp.builder().
+        DepositAccountDetailRsp depositDetail = DepositAccountDetailRsp.builder().
                 channel(trade.getChannel())
                 .orderNo(trade.getOrderNo())
                 .account(trade.getAccountInfo())
                 .remark(trade.getRemark())
                 .createDate(trade.getCrtTime())
-                .overDueDate(trade.getOverDueTime()).build())
+                .overDueDate(trade.getOverDueTime()).build();
+
+        if(trade.getChannel() == CHANNEL_BANK){
+            String[] name_cardNo = depositDetail.getAccount().split("#");
+            if(StringUtils.isEmpty(name_cardNo)||name_cardNo.length!=2){
+                throw new ServiceException(DEPOSIT_FAILED_ORDER_NOT_EXIST);
+            }
+            //银行卡渠道-拆分成姓名+卡号
+            depositDetail.setName(name_cardNo[0]);
+            depositDetail.setAccount(name_cardNo[1]);
+        }
+        return ResponseResult.builder().data(depositDetail)
                 .code(DEPOSIT_APPLY_SUCCESS.getCode())
                 .msg(DEPOSIT_APPLY_SUCCESS.getDesc()).build();
     }
@@ -220,7 +227,7 @@ public class PayApiServiceImpl implements PayApiService {
             result = (ResponseResult) bankCardService.bankSelect(selectCardReq);
             if(result.getCode()==BANK_CARD_SELECT_SUC.getCode()){
                 SelectCardRsp data = (SelectCardRsp) result.getData();
-                account_info = data.getName()+"#"+data.getCardNo();
+                account_info = data.getName().trim()+"#"+data.getCardNo().trim();
                 accountSelectRsp.setAccount_id(data.getAccount_id());
             }
 
@@ -234,7 +241,7 @@ public class PayApiServiceImpl implements PayApiService {
         //3)填充其他信息
         accountSelectRsp.setChannel(req.getChannel());
         accountSelectRsp.setAmount(req.getAmount());
-        accountSelectRsp.setAccount_info(account_info);
+        accountSelectRsp.setAccount_info(account_info.trim());
         result.setData(accountSelectRsp);
         return accountSelectRsp;
     }
