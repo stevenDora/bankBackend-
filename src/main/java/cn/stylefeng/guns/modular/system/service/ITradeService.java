@@ -14,4 +14,6 @@ import com.baomidou.mybatisplus.service.IService;
 public interface ITradeService extends IService<Trade> {
 
     Trade selectTradeByOrderNo(String orderNo);
+
+    void createOrder(String orderNo);
 }

@@ -1,6 +1,7 @@
 package cn.stylefeng.guns.modular.system.service.impl;
 
 import cn.stylefeng.guns.modular.system.annotate.AccessLimit;
+import cn.stylefeng.guns.modular.system.components.rabbitmq.MQSender;
 import cn.stylefeng.guns.modular.system.components.redis.RedisDao;
 import cn.stylefeng.guns.modular.system.constant.PayApiEnum;
 import cn.stylefeng.guns.modular.system.dto.*;
@@ -15,6 +16,7 @@ import cn.stylefeng.roses.kernel.model.exception.ServiceException;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.sun.javafx.collections.MappingChange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,10 +29,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
+import static cn.stylefeng.guns.modular.system.constant.Constant.MessageRoute.MSG_ROUTE_ORDER;
 import static cn.stylefeng.guns.modular.system.constant.Constant.OrderStatus.*;
 import static cn.stylefeng.guns.modular.system.constant.Constant.RedisOrderPrefix.ORDER_DETAIL;
 import static cn.stylefeng.guns.modular.system.constant.Constant.RedisOrderPrefix.ORDER_DUPLICATE_SUBMIT_CHECK;
+import static cn.stylefeng.guns.modular.system.constant.Constant.orderRoute.CREATE_ORDER;
 import static cn.stylefeng.guns.modular.system.constant.PayApiEnum.*;
 import static cn.stylefeng.guns.modular.system.constant.Constant.Channel.*;
 import static cn.stylefeng.guns.modular.system.constant.Constant.PushStatus.PUSH_STATUS_UNHANDLE;
@@ -41,20 +47,16 @@ public class PayApiServiceImpl implements PayApiService {
 
     private static Logger logger = LoggerFactory.getLogger(PayApiServiceImpl.class);
 
-
-    @Autowired
-    private IBankCardService bankCardService;
-
     @Autowired
     private ITradeService tradeService;
 
     @Autowired
     private RedisDao redisDao;
 
-    private String PAYLINK_PREFIX = "http://localhost:8080/payApi/counter/";
-
     @Autowired
-    private IBankRemarkService bankRemarkService;
+    private MQSender mqSender;
+
+    private String PAYLINK_PREFIX = "http://localhost:8080/payApi/counter/";
 
 /*    @AccessLimit(seconds = 5, maxCount = 5, type = ORDER_DUPLICATE_SUBMIT_CHECK)*/
     @Override
@@ -75,18 +77,17 @@ public class PayApiServiceImpl implements PayApiService {
                         .code(PayApiEnum.DEPOSIT_FAILED_MERCHANT_REPEAT_SUBMIT.getCode())
                         .msg(PayApiEnum.DEPOSIT_FAILED_MERCHANT_REPEAT_SUBMIT.getDesc()).build();
             }
-            AccountSelectRsp accountSelectRsp = this.accountSelect(req);
             //生成订单id
             String orderNo = getOrderNo(req);
 
             //缓存订单
-            Trade trade = initOrder(req,orderNo,accountSelectRsp);
+            Trade trade = initOrder(req,orderNo);
             String order_detail_key = ORDER_DETAIL + orderNo;
             redisDao.set(order_detail_key, JSONObject.toJSONString(trade));
             redisDao.expire(order_detail_key,30*60);
 
-            //异步入库
-            this.createOrder(trade);
+            asyncCreateOrder(orderNo);
+
             payLink  = payLink + orderNo;
             depositRsp = PayDepositRsp.builder()
                     .amount(req.getAmount())
@@ -113,9 +114,18 @@ public class PayApiServiceImpl implements PayApiService {
                 .msg(PayApiEnum.DEPOSIT_APPLY_SUCCESS.getDesc()).build();
     }
 
+    private void asyncCreateOrder(String orderNo) {
+        //异步入库
+        Map msg = new HashMap();
+        msg.put("op",CREATE_ORDER);
+        msg.put("orderNo",orderNo);
+
+        mqSender.sendMsg(JSONObject.toJSONString(msg),
+                MSG_ROUTE_ORDER);
+    }
 
 
-    private Trade initOrder(PayDepositReq req,String orderNo,AccountSelectRsp rsp){
+    private Trade initOrder(PayDepositReq req,String orderNo){
         Trade trade = Trade.builder()
                 .applyAmount(req.getAmount())
                 .actualAmount(new BigDecimal(0))
@@ -126,23 +136,14 @@ public class PayApiServiceImpl implements PayApiService {
                 .orderNo(orderNo)
                 .pushTime(null)
                 .arriveTime(null)
-                .remark(rsp.getRemark())
                 .serviceFee(new BigDecimal(0))
                 .orderStatus(ORDER_STATUS_PENDING)
                 .pushStatus(PUSH_STATUS_UNHANDLE)
-                .accountId(rsp.getAccount_id())
-                .accountInfo(rsp.getAccount_info()).build();
+                .build();
 
         return trade;
     }
 
-    @Async
-    @Transactional
-    @Override
-    public void createOrder(Trade trade){
-        trade.setOrderStatus(ORDER_STATUS_PROCESS);
-        tradeService.insert(trade);
-    }
 
     @Override
     public Object getDepositDetail(String orderNo){
@@ -209,43 +210,6 @@ public class PayApiServiceImpl implements PayApiService {
         redisDao.set(orderNo, JSONObject.toJSONString(trade));
         return false;
     }
-
-
-    private AccountSelectRsp accountSelect(PayDepositReq req){
-        ResponseResult result = null;
-        String account_info = "";
-        AccountSelectRsp accountSelectRsp = AccountSelectRsp.builder().build();
-        if(req.getChannel()== CHANNEL_ALIPAY){
-            account_info = "";
-        }
-        else if(req.getChannel()== CHANNEL_WXCHAT){
-            account_info = "";
-        }
-        else if(req.getChannel()== CHANNEL_BANK){
-            SelectCardReq selectCardReq = SelectCardReq.builder()
-                    .amount(req.getAmount()).build();
-            result = (ResponseResult) bankCardService.bankSelect(selectCardReq);
-            if(result.getCode()==BANK_CARD_SELECT_SUC.getCode()){
-                SelectCardRsp data = (SelectCardRsp) result.getData();
-                account_info = data.getName().trim()+"#"+data.getCardNo().trim();
-                accountSelectRsp.setAccount_id(data.getAccount_id());
-            }
-
-        }
-        if(StringUtils.isEmpty(account_info)){
-            throw new ServiceException(ACCOUNT_SELECT_FAILED);
-        }
-        //2)生成附言
-        accountSelectRsp.setRemark(bankRemarkService.genRemark());
-
-        //3)填充其他信息
-        accountSelectRsp.setChannel(req.getChannel());
-        accountSelectRsp.setAmount(req.getAmount());
-        accountSelectRsp.setAccount_info(account_info.trim());
-        result.setData(accountSelectRsp);
-        return accountSelectRsp;
-    }
-
 
     private String getOrderNo(PayDepositReq req){
         String orderNo = redisDao.getOrderNo();

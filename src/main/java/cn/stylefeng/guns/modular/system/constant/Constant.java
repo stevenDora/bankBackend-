@@ -53,7 +53,12 @@ public class Constant {
 
 
     public interface MessageRoute{
-        String MSG_ORDER_CREATE = "MSG_ORDER_CREATE";
+        String MSG_ROUTE_ORDER = "MSG_ROUTE_ORDER";
+    }
+
+
+    public interface orderRoute{
+        Integer CREATE_ORDER = 1;
     }
 
 }
