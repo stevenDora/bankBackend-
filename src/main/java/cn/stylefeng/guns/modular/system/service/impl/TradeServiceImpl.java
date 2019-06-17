@@ -7,6 +7,7 @@ import cn.stylefeng.guns.modular.system.dao.TradeMapper;
 import cn.stylefeng.guns.modular.system.service.AssignOrderService;
 import cn.stylefeng.guns.modular.system.service.ITradeService;
 import cn.stylefeng.guns.modular.system.utils.StringUtils;
+import cn.stylefeng.roses.kernel.model.exception.ServiceException;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import static cn.stylefeng.guns.modular.system.constant.Constant.OrderStatus.ORDER_STATUS_PROCESS;
+import static cn.stylefeng.guns.modular.system.constant.PayApiEnum.UN_KNOW_ERROR;
 
 /**
  * <p>
@@ -47,6 +49,11 @@ public class TradeServiceImpl extends ServiceImpl<TradeMapper, Trade> implements
     @Transactional
     public void createOrder(String orderNo) {
         String orderStr = redisDao.get(orderNo);
+        if(StringUtils.isEmpty(orderStr)){
+            throw new ServiceException(UN_KNOW_ERROR);
+        }
+        //lazy update
+        redisDao.del("",orderNo);
         Trade trade = JSONObject.parseObject(orderStr, Trade.class);
         AccountSelectRsp rsp = assignOrderService.accountSelect(trade.getChannel(),
                 trade.getApplyAmount());
