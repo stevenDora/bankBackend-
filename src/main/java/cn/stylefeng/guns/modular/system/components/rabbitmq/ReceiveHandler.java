@@ -22,6 +22,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Map;
 
@@ -51,19 +52,23 @@ public class ReceiveHandler {
     @RabbitListener(queues = {RabbitMQConfig.QUEUE_ORDER_PROCESS})
     public void orderHandler(String msg,Message message,
                              Channel channel){
-        logger.info("receive raw message is {}",msg);
-        Map map = JSON.parseObject(msg, Map.class);
-        Integer op =(Integer)map.get("op");
-        String orderNo = (String) map.get("orderNo");
+        try {
+            logger.info("receive raw message is {}",msg);
+            Map map = JSON.parseObject(msg, Map.class);
+            Integer op =(Integer)map.get("op");
+            String orderNo = (String) map.get("orderNo");
 
-        if(StringUtils.isEmpty(op)
-                ||StringUtils.isEmpty(orderNo))
-            throw new ServiceException(MSG_COMMUNICATE_ERROR);
+            if(StringUtils.isEmpty(op)
+                    ||StringUtils.isEmpty(orderNo))
+                throw new ServiceException(MSG_COMMUNICATE_ERROR);
 
-        if(op==CREATE_ORDER){
-            tradeService.createOrder(orderNo);
+            if(op==CREATE_ORDER){
+                tradeService.createOrder(orderNo);
+            }
+            channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-
     }
 
 
