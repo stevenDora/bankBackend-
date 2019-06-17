@@ -14,55 +14,70 @@
     <script type="text/javascript" src="${ctxPath}/static/js/common.js"></script>
 </head>
 <body>
-<div class="panel panel-default" >
-  <div class="panel-heading">支付订单详情</div>
-  <table class="table" id="goodslist">
-<!--        <tr>
-        <td>商品名称</td>  
-        <td colspan="3" id="goodsName"></td> 
-     </tr>  -->
-<!--     <tr>
-        <td>商品图片</td>  
-        <td colspan="2"><img  id="goodsImg" width="200" height="200" /></td>  
-     </tr>-->
-      <tr>
-          <td>订单号</td>
-          <td colspan="2"  id="orderNo"></td>
-      </tr>
-      <tr>  
-        <td>充值金额</td>
-        <td bgcolor="#00FF00" colspan="2"  id="amount"></td>
-     </tr>
-      <tr>
-          <td>订单状态</td>
-          <td id="orderStatus">
-              <!--        <td>
-                          <button class="btn btn-primary btn-block" type="submit" id="payButton">立即支付</button>
-                      </td>-->
-      </tr>
-      <tr>
-          <td>附言</td>
-          <td id="remark"></td>
-      </tr>
-      <tr>
-          <td>姓名</td>
-          <td id="name"></td>
-      </tr>
-      <tr>
-          <td>卡号</td>
-          <td id="cardNo"></td>
-      </tr>
-     <tr>
-     	<td>下单时间</td>
-        <td id="createDate" colspan="2"></td>
-     </tr>
-      <tr>
-          <td>订单过期时间</td>
-          <td bgcolor="#FF0000" id="overDueDate" colspan="2"></td>
-      </tr>
+<form class="form-horizontal" role="form" id="payForm" >
 
-  </table>
-</div>
+    <div class="panel panel-default" >
+      <div class="panel-heading">支付订单详情</div>
+      <table class="table" id="goodslist">
+    <!--        <tr>
+            <td>商品名称</td>
+            <td colspan="3" id="goodsName"></td>
+         </tr>  -->
+    <!--     <tr>
+            <td>商品图片</td>
+            <td colspan="2"><img  id="goodsImg" width="200" height="200" /></td>
+         </tr>-->
+          <tr>
+              <td>订单号</td>
+              <td colspan="2"  id="orderNo"></td>
+          </tr>
+          <tr>
+            <td>充值金额</td>
+            <td bgcolor="#00FF00" colspan="2"  id="amount"></td>
+         </tr>
+          <tr>
+              <td>订单状态</td>
+              <td id="orderStatus">
+                  <!--        <td>
+                              <button class="btn btn-primary btn-block" type="submit" id="payButton">立即支付</button>
+                          </td>-->
+          </tr>
+          <tr>
+              <td>附言</td>
+              <td id="remark"></td>
+          </tr>
+          <tr>
+              <td>姓名</td>
+              <td id="name"></td>
+          </tr>
+          <tr>
+              <td>卡号</td>
+              <td id="cardNo"></td>
+          </tr>
+         <tr>
+            <td>下单时间</td>
+            <td id="createDate" colspan="2"></td>
+         </tr>
+          <tr>
+              <td>订单过期时间</td>
+              <td bgcolor="#FF0000" id="overDueDate" colspan="2"></td>
+          </tr>
+      </table>
+    </div>
+    <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-10">
+            <button id="payFormBtn" type="button" class="btn btn-default">确认</button>
+        </div>
+    </div>
+    <div class="form-group pay-div" style="display:none;">
+        <label class="col-sm-2 control-label">App端</label>
+        <div class="col-sm-2"><a id="pay-link" href="">点击这里进行支付</a></div>
+    </div>
+    <div class="form-group pay-div" style="display:none;">
+        <label class="col-sm-2 control-label">网页端</label>
+        <div class="col-sm-2"><div id="pay-qrcode"></div></div>
+    </div>
+</form>
 </body>
 </html>
 <script>
