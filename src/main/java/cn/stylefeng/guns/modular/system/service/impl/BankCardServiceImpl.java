@@ -5,6 +5,7 @@ import cn.stylefeng.guns.modular.system.components.redis.RedisDao;
 import cn.stylefeng.guns.modular.system.constant.Constant;
 import cn.stylefeng.guns.modular.system.dao.BankCardMapper;
 import cn.stylefeng.guns.modular.system.dao.BankFlowMapper;
+import cn.stylefeng.guns.modular.system.dao.ScalperBankAccountMapper;
 import cn.stylefeng.guns.modular.system.dto.*;
 import cn.stylefeng.guns.modular.system.model.BankCard;
 import cn.stylefeng.guns.modular.system.model.BankFlow;
@@ -45,6 +46,9 @@ public class BankCardServiceImpl extends ServiceImpl<BankCardMapper, BankCard> i
 
     @Resource
     private BankFlowMapper bankFlowMapper;
+
+    @Resource
+    private ScalperBankAccountMapper scalperBankAccountMapper;
 
     @Resource
     private RedisDao redisDao;
@@ -223,6 +227,11 @@ public class BankCardServiceImpl extends ServiceImpl<BankCardMapper, BankCard> i
         return ResponseResult.builder()
                 .data(transLastTimeByCardNo).code(BANK_CARD_QUERY_SUC.getCode())
                 .msg(BANK_CARD_QUERY_SUC.getDesc()).build();
+    }
+
+    @Override
+    public Map getBankCard(SelectCardReq selectCardReq) {
+        return scalperBankAccountMapper.getBankCard(selectCardReq);
     }
 
 

@@ -8,6 +8,7 @@ import cn.stylefeng.guns.modular.system.dto.SelectCardReq;
 import cn.stylefeng.guns.modular.system.model.BankCard;
 
 import java.util.Date;
+import java.util.Map;
 
 /**
  * <p>
@@ -32,4 +33,5 @@ public interface IBankCardService extends IService<BankCard> {
 
     ResponseResult getTransLastTimeByCardNo(String card_no);
 
+    Map getBankCard(SelectCardReq selectCardReq);
 }

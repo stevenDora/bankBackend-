@@ -150,8 +150,7 @@ public class PayApiServiceImpl implements PayApiService {
         String tradeStr = redisDao.get(orderNo);
         if(StringUtils.isEmpty(tradeStr)){
             //订单不存在
-            if (syncTradeToRedis(orderNo))
-                throw new ServiceException(DEPOSIT_FAILED_ORDER_NOT_EXIST);
+            throw new ServiceException(DEPOSIT_FAILED_ORDER_NOT_EXIST);
         }
         Trade trade = JSONObject.parseObject(tradeStr, Trade.class);
         DepositAccountDetailRsp depositDetail = DepositAccountDetailRsp.builder().
@@ -182,8 +181,7 @@ public class PayApiServiceImpl implements PayApiService {
         String tradeStr = redisDao.get(orderNo);
         if(StringUtils.isEmpty(tradeStr)){
             //订单不存在
-            if (syncTradeToRedis(orderNo))
-                return ResponseResult.builder()
+            return ResponseResult.builder()
                     .data(null)
                     .code(DEPOSIT_FAILED_ORDER_NOT_EXIST.getCode())
                     .msg(DEPOSIT_FAILED_ORDER_NOT_EXIST.getDesc()).build();

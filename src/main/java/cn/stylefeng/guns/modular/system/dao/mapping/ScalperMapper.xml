@@ -34,4 +34,28 @@
         id, scalper_id, root_id, upper_id, agent_path, avaliable_balance, freeze_balance, total_balance, collect_balance_sum_day, collect_balance_max_day, last_assign_task_time, last_account_time, last_charge_time, last_flow_push_time, alipay_switch, wx_switch, bank_switch, block_status, alipay_rate, wx_rate, bank_rate, crt_time, upt_time
     </sql>
 
+
+    <select id="findBestScalper" resultType="java.lang.String">
+        select scalper_id from scalper where avaliable_balance >= avaliable_balance - #{amount}
+        from scalper where scalper_id = #{scalperId}
+        <choose>
+            <when test="channel ==1">
+                and alipay_switch = 1
+            </when>
+            <when test="channel ==2">
+                and wx_switch = 1
+            </when>
+            <when test="channel ==3">
+                and bank_switch = 1
+            </when>
+        </choose>
+        and block_status = 1
+        order by last_assign_task_time asc,last_account_time asc,last_charge_time desc limit 1
+    </select>
+
+    <update id="updateScalperAccount">
+        update scalper set avaliable_balance = avaliable_balance - #{amount},freeze_balance = freeze_balance + #{amount}
+         where scalper_id = #{scalper_id} and (avaliable_balance >= avaliable_balance - #{amount})
+    </update>
+
 </mapper>

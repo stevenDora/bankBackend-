@@ -52,10 +52,9 @@ public class TradeServiceImpl extends ServiceImpl<TradeMapper, Trade> implements
         if(StringUtils.isEmpty(orderStr)){
             throw new ServiceException(UN_KNOW_ERROR);
         }
-        //lazy update
-        redisDao.del("",orderNo);
         Trade trade = JSONObject.parseObject(orderStr, Trade.class);
-        AccountSelectRsp rsp = assignOrderService.accountSelect(trade.getChannel(),
+        AccountSelectRsp rsp = assignOrderService.accountSelect(orderNo,
+                trade.getChannel(),
                 trade.getApplyAmount());
 
         trade.setRemark(rsp.getRemark());
@@ -63,6 +62,7 @@ public class TradeServiceImpl extends ServiceImpl<TradeMapper, Trade> implements
         trade.setAccountInfo(rsp.getAccount_info());
         trade.setOrderStatus(ORDER_STATUS_PROCESS);
         tradeMapper.insert(trade);
+        redisDao.set(orderNo, JSONObject.toJSONString(trade));
     }
 
 }

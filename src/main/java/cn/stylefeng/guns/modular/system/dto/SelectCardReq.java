@@ -14,6 +14,7 @@ import java.math.BigDecimal;
 @Builder
 public class SelectCardReq {
 
+    private String scalper_id;
     private BigDecimal amount;
 
 }

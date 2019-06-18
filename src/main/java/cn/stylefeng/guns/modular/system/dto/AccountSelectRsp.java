@@ -13,6 +13,8 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @Builder
 public class AccountSelectRsp {
+    private String orderNo;
+    private Boolean isSuc;
     private BigDecimal amount;
     private Integer channel;
     private String account_info;
