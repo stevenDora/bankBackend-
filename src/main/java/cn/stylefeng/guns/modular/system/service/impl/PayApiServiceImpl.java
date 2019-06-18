@@ -6,10 +6,7 @@ import cn.stylefeng.guns.modular.system.components.redis.RedisDao;
 import cn.stylefeng.guns.modular.system.constant.PayApiEnum;
 import cn.stylefeng.guns.modular.system.dto.*;
 import cn.stylefeng.guns.modular.system.model.Trade;
-import cn.stylefeng.guns.modular.system.service.IBankCardService;
-import cn.stylefeng.guns.modular.system.service.IBankRemarkService;
-import cn.stylefeng.guns.modular.system.service.ITradeService;
-import cn.stylefeng.guns.modular.system.service.PayApiService;
+import cn.stylefeng.guns.modular.system.service.*;
 import cn.stylefeng.guns.modular.system.utils.DateUtil;
 import cn.stylefeng.guns.modular.system.utils.StringUtils;
 import cn.stylefeng.roses.kernel.model.exception.ServiceException;
@@ -48,7 +45,10 @@ public class PayApiServiceImpl implements PayApiService {
     private static Logger logger = LoggerFactory.getLogger(PayApiServiceImpl.class);
 
     @Autowired
-    private ITradeService tradeService;
+    private IScalperService scalperService;
+
+    @Autowired
+    private IFlowDataService flowDataService;
 
     @Autowired
     private RedisDao redisDao;
@@ -197,7 +197,15 @@ public class PayApiServiceImpl implements PayApiService {
                 .msg(DEPOSIT_APPLY_SUCCESS.getDesc()).build();
     }
 
-    private boolean syncTradeToRedis(String orderNo) {
+    @Transactional
+    @Override
+    public Object notify(FlowNotifyReq flowNotifyReq) {
+        scalperService.selectByMap()
+        flowDataService.save(flowNotifyReq);
+        return null;
+    }
+
+    /*private boolean syncTradeToRedis(String orderNo) {
         Trade trade = tradeService.selectTradeByOrderNo(orderNo);
         if (null == trade) {
             redisDao.set(orderNo, "订单不存在");
@@ -207,7 +215,7 @@ public class PayApiServiceImpl implements PayApiService {
         }
         redisDao.set(orderNo, JSONObject.toJSONString(trade));
         return false;
-    }
+    }*/
 
     private String getOrderNo(PayDepositReq req){
         String orderNo = redisDao.getOrderNo();

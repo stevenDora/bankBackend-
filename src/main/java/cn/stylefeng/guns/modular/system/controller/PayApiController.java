@@ -2,6 +2,7 @@ package cn.stylefeng.guns.modular.system.controller;
 
 
 import cn.stylefeng.guns.modular.system.constant.PayApiEnum;
+import cn.stylefeng.guns.modular.system.dto.FlowNotifyReq;
 import cn.stylefeng.guns.modular.system.dto.PayDepositReq;
 import cn.stylefeng.guns.modular.system.dto.ResponseResult;
 import cn.stylefeng.guns.modular.system.model.CompanyDo;
@@ -89,6 +90,27 @@ public class PayApiController {
         return payApi.getDepositDetail(orderNo);
     }
 
+    @ApiOperation("异步流水到账")
+    @RequestMapping(value = "/notify")
+    @ResponseBody
+    public Object notify(@Valid @RequestBody FlowNotifyReq req,
+                         BindingResult bindingResult){
+        if (bindingResult.hasErrors()) {
+            return ResponseResult.builder().code(PayApiEnum.DEPOSIT_FAILED_INPUT_PARAMETERS.getCode())
+                    .msg(bindingResult.getFieldError().getDefaultMessage()).build();
+        }
+
+        String reqStr = JSONObject.toJSONString(req);
+        logger.info("商户->counter充值入参{}", reqStr);
+        boolean flag = this.checkCommSign(reqStr, req.getSign(), req.getIsSign());
+
+
+        if (flag == false) {
+            return ResponseResult.builder().code(PayApiEnum.FLOW_FAILED_SIGN.getCode())
+                    .msg(PayApiEnum.FLOW_FAILED_SIGN.getDesc()).build();
+        }
+        return payApi.notify(req);
+    }
 
     private boolean checkSign(String reqStr, String sign, String isSign, Long companyId) {
         if (StringUtils.isNotEmpty(isSign)) {
@@ -98,13 +120,25 @@ public class PayApiController {
         if (company == null) {
             return false;
         }
+        return verifySign(reqStr, sign, company.getPrivateKey());
+    }
+
+    private boolean checkCommSign(String reqStr, String sign, String isSign) {
+        if (StringUtils.isNotEmpty(isSign)) {
+            return true;
+        }
+        return verifySign(reqStr, sign, "0xaabbccddeeffuuoovvsszz");
+    }
+
+    private boolean verifySign(String reqStr, String sign, String s) {
         Map<String, Object> reqMap = JSONObject.parseObject(reqStr, Map.class);
         reqMap.remove("sign");
-        String curSign = SignUtils.getSign(reqMap, company.getPrivateKey());
+        String curSign = SignUtils.getSign(reqMap, s);
         if (sign.equals(curSign)) {
             return true;
         }
         return false;
     }
+
 
 }

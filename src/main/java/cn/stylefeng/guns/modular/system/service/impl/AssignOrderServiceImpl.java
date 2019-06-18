@@ -38,7 +38,7 @@ public class AssignOrderServiceImpl implements AssignOrderService {
     private IBankCardService bankCardService;
 
     @Autowired
-    private IBankRemarkService bankRemarkService;
+    private IBankRemarkService remarkService;
 
     @Transactional
     @Override
@@ -108,7 +108,7 @@ public class AssignOrderServiceImpl implements AssignOrderService {
         }
 
         //2)生成附言
-        accountSelectRsp.setRemark(bankRemarkService.genRemark());
+        accountSelectRsp.setRemark(remarkService.genRemark());
 
         //3)填充其他信息
         accountSelectRsp.setChannel(channel);

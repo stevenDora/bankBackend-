@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.stylefeng.guns.modular.system.dao.FlowDataMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="cn.stylefeng.guns.modular.system.model.FlowData">
+        <id column="id" property="id" />
+        <result column="scalper_id" property="scalperId" />
+        <result column="channel" property="channel" />
+        <result column="amount" property="amount" />
+        <result column="remark" property="remark" />
+        <result column="from_ip" property="fromIp" />
+        <result column="receive_time" property="receiveTime" />
+        <result column="data" property="data" />
+        <result column="order_no" property="orderNo" />
+        <result column="is_matched" property="isMatched" />
+        <result column="crt_time" property="crtTime" />
+        <result column="upt_time" property="uptTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, scalper_id, channel, amount, remark, from_ip, receive_time, data, order_no, is_matched, crt_time, upt_time
+    </sql>
+
+</mapper>
