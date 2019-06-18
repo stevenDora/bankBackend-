@@ -40,7 +40,7 @@ import static cn.stylefeng.guns.modular.system.constant.PayApiEnum.MSG_COMMUNICA
  * @version 1.0
  * @create 2018-06-17 21:21
  **/
-@Component
+//@Component
 public class ReceiveHandler {
 
 

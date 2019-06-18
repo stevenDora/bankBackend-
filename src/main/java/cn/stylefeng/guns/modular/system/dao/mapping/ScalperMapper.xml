@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.stylefeng.guns.modular.system.dao.ScalperMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="cn.stylefeng.guns.modular.system.model.Scalper">
+        <id column="id" property="id" />
+        <result column="scalper_id" property="scalperId" />
+        <result column="root_id" property="rootId" />
+        <result column="upper_id" property="upperId" />
+        <result column="agent_path" property="agentPath" />
+        <result column="avaliable_balance" property="avaliableBalance" />
+        <result column="freeze_balance" property="freezeBalance" />
+        <result column="total_balance" property="totalBalance" />
+        <result column="collect_balance_sum_day" property="collectBalanceSumDay" />
+        <result column="collect_balance_max_day" property="collectBalanceMaxDay" />
+        <result column="last_assign_task_time" property="lastAssignTaskTime" />
+        <result column="last_account_time" property="lastAccountTime" />
+        <result column="last_charge_time" property="lastChargeTime" />
+        <result column="last_flow_push_time" property="lastFlowPushTime" />
+        <result column="alipay_switch" property="alipaySwitch" />
+        <result column="wx_switch" property="wxSwitch" />
+        <result column="bank_switch" property="bankSwitch" />
+        <result column="block_status" property="blockStatus" />
+        <result column="alipay_rate" property="alipayRate" />
+        <result column="wx_rate" property="wxRate" />
+        <result column="bank_rate" property="bankRate" />
+        <result column="crt_time" property="crtTime" />
+        <result column="upt_time" property="uptTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, scalper_id, root_id, upper_id, agent_path, avaliable_balance, freeze_balance, total_balance, collect_balance_sum_day, collect_balance_max_day, last_assign_task_time, last_account_time, last_charge_time, last_flow_push_time, alipay_switch, wx_switch, bank_switch, block_status, alipay_rate, wx_rate, bank_rate, crt_time, upt_time
+    </sql>
+
+</mapper>

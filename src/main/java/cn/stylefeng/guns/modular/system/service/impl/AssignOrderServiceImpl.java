@@ -10,6 +10,7 @@ import cn.stylefeng.guns.modular.system.service.IBankRemarkService;
 import cn.stylefeng.guns.modular.system.utils.StringUtils;
 import cn.stylefeng.roses.kernel.model.exception.ServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 
@@ -19,6 +20,7 @@ import static cn.stylefeng.guns.modular.system.constant.Constant.Channel.CHANNEL
 import static cn.stylefeng.guns.modular.system.constant.PayApiEnum.ACCOUNT_SELECT_FAILED;
 import static cn.stylefeng.guns.modular.system.constant.PayApiEnum.BANK_CARD_SELECT_SUC;
 
+@Service
 public class AssignOrderServiceImpl implements AssignOrderService {
 
     @Autowired

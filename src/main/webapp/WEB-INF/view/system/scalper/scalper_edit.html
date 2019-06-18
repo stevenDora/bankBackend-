@@ -1,0 +1,48 @@
+@layout("/common/_container.html"){
+<div class="ibox float-e-margins">
+    <div class="ibox-content">
+        <div class="form-horizontal">
+
+            <div class="row">
+                <div class="col-sm-6 b-r">
+                            <#input id="id" name="" value="${item.id}" underline="true"/>
+                            <#input id="scalperId" name="接受推送派单的唯一金主id" value="${item.scalperId}" underline="true"/>
+                            <#input id="rootId" name="根代理id" value="${item.rootId}" underline="true"/>
+                            <#input id="upperId" name="直接代理id" value="${item.upperId}" underline="true"/>
+                            <#input id="agentPath" name="代理层级关系路径" value="${item.agentPath}" underline="true"/>
+                            <#input id="avaliableBalance" name="可用余额" value="${item.avaliableBalance}" underline="true"/>
+                            <#input id="freezeBalance" name="冻结余额" value="${item.freezeBalance}" underline="true"/>
+                            <#input id="totalBalance" name="总额" value="${item.totalBalance}" underline="true"/>
+                            <#input id="collectBalanceSumDay" name="当日累计收款" value="${item.collectBalanceSumDay}" underline="true"/>
+                            <#input id="collectBalanceMaxDay" name="当日收款上限" value="${item.collectBalanceMaxDay}" underline="true"/>
+                            <#input id="lastAssignTaskTime" name="最后一次派单时间" value="${item.lastAssignTaskTime}" underline="true"/>
+                            <#input id="lastAccountTime" name="最后一次到账时间" value="${item.lastAccountTime}" />
+                </div>
+
+                <div class="col-sm-6">
+                            <#input id="lastChargeTime" name="最后一次充值时间" value="${item.lastChargeTime}" underline="true"/>
+                            <#input id="lastFlowPushTime" name="最后一次信息流水推送时间" value="${item.lastFlowPushTime}" underline="true"/>
+                            <#input id="alipaySwitch" name="金主支付宝开关" value="${item.alipaySwitch}" underline="true"/>
+                            <#input id="wxSwitch" name="金主微信开关" value="${item.wxSwitch}" underline="true"/>
+                            <#input id="bankSwitch" name="金主银行卡开关" value="${item.bankSwitch}" underline="true"/>
+                            <#input id="blockStatus" name="运营总控" value="${item.blockStatus}" underline="true"/>
+                            <#input id="alipayRate" name="金主支付宝费率" value="${item.alipayRate}" underline="true"/>
+                            <#input id="wxRate" name="金主微信费率" value="${item.wxRate}" underline="true"/>
+                            <#input id="bankRate" name="金主银行卡费率" value="${item.bankRate}" underline="true"/>
+                            <#input id="crtTime" name="" value="${item.crtTime}" underline="true"/>
+                            <#input id="uptTime" name="" value="${item.uptTime}" />
+                </div>
+            </div>
+
+            <div class="row btn-group-m-t">
+                <div class="col-sm-10">
+                    <#button btnCss="info" name="提交" id="ensure" icon="fa-check" clickFun="ScalperInfoDlg.editSubmit()"/>
+                    <#button btnCss="danger" name="取消" id="cancel" icon="fa-eraser" clickFun="ScalperInfoDlg.close()"/>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+<script src="${ctxPath}/static/modular/system/scalper/scalper_info.js"></script>
+@}
