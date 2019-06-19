@@ -20,10 +20,13 @@ public class Constant {
     public static final String BANK_RT_PARM_LAST_CURSOR = "cash_flow_cursor";
     public static final String BANK_RT_PARM_BATCHNUM = "cash_flow_batch_num";
 
+    public static final Integer ORDER_OVERDUE_HANDLE_MAX = 100;
+    public static final Integer ORDER_ACCOUNT_HANDLE_MAX = 100;
 
     public interface Lock{
         String CASH_FLOW_LOCK_PREFIX = "cash_flow_lock_prefix";
         String TRADE_INVALID_OVERTIME_LOCK_PREFIX = "trade_invalid_overtime_lock_prefix";
+        String ACCOUNT_CHANGE_LOCK_PREFIX = "account_change_lock_prefix";
         String TRADE_ORDER_STATUS_LOCK_PREFIX = "trade_order_status_lock_prefix";
         String SCALPER_LOCK_PREFIX = "scalper_lock_prefix";
     }

@@ -21,6 +21,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 import java.util.List;
 
+import static cn.stylefeng.guns.modular.system.constant.Constant.Lock.ACCOUNT_CHANGE_LOCK_PREFIX;
 import static cn.stylefeng.guns.modular.system.constant.Constant.Lock.TRADE_INVALID_OVERTIME_LOCK_PREFIX;
 import static cn.stylefeng.guns.modular.system.constant.Constant.OrderStatus.ORDER_STATUS_SUCCESS;
 import static cn.stylefeng.guns.modular.system.constant.PayApiEnum.BANK_CARD_LOCK_FAILED;
@@ -71,6 +72,33 @@ public class TimerTask {
     @Scheduled(cron = "0 0/1 * * * ?")
     public void processAccountChange(){
         logger.info("开始批量处理帐变.....");
+        boolean locked_1 = true;
+        try {
+            /*添加分佈式鎖*/
+            if (redisDistributedLock.lock(ACCOUNT_CHANGE_LOCK_PREFIX)){
+                List<Trade> list = iTradeService.findNeedAcountChangeOrders(num);
+                if (StringUtils.isNotEmpty(list)){
+                    logger.info("执行帳變處理定时任务");
+                    logger.info("总共【{}】条需要處理帳變的订单",list.size());
+                    list.stream().forEach(trade -> {
+                        iTradeService.handleAccountChange(trade);
+                    });
+                } else {
+                    logger.info("暂无异常订单处理");
+                }
+            } else {
+                logger.info("异常超时订单定时任务已被其他线程使用，等待释放");
+                locked_1 = false;
+            }
+        } catch (Exception e) {
+            logger.info("执行异常超时订单定时任务异常信息:{}",e);
+        } finally {
+            /*釋放鎖*/
+            logger.info("釋放分布式锁");
+            redisDistributedLock.unlock(ACCOUNT_CHANGE_LOCK_PREFIX,locked_1);
+        }
+
+
     }
 
     @Scheduled(cron = "0 0/2 * * * ?")

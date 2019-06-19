@@ -21,7 +21,11 @@ public interface ITradeService extends IService<Trade> {
 
     void createOrder(String orderNo);
 
-    List<Trade> findTradeInfoWithInvalidOverTime();
+    List<Trade> findTradeInfoWithInvalidOverTime(Integer num);
 
     void invalidOrder(String orderNo);
+
+    List<Trade> findNeedAcountChangeOrders(Integer num);
+
+    void handleAccountChange(Trade trade);
 }

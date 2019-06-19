@@ -33,7 +33,17 @@ public interface TradeMapper extends BaseMapper<Trade> {
 
 
     @Select("select order_no,scalper_id from t_dora_trade where order_status = 1 " +
-            "overDue_time < NOW()")
+            "overDue_time < NOW() limit #{num}")
     @ResultType(cn.stylefeng.guns.modular.system.model.Trade.class)
-    List<Trade> findTradeInfoWithInvalidOverTime();
+    List<Trade> findTradeInfoWithInvalidOverTime(Integer num);
+
+
+    @Select("select order_no,order_status from t_dora_trade where order_status in (2,3) " +
+            "and account_change = 1 limit #{num}")
+    @ResultType(cn.stylefeng.guns.modular.system.model.Trade.class)
+    List<Trade> findNeedAcountChangeOrders(Integer num);
+
+    @Update("update t_dora_trade set account_change = 2 where order_no = #{orderNo} " +
+            "and account_change = 1 and order_status in (2,3)")
+    Integer execAccountChange(String orderNo);
 }

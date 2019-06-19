@@ -20,8 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-import static cn.stylefeng.guns.modular.system.constant.Constant.OrderStatus.ORDER_STATUS_PROCESS;
-import static cn.stylefeng.guns.modular.system.constant.Constant.OrderStatus.ORDER_STATUS_SUCCESS;
+import static cn.stylefeng.guns.modular.system.constant.Constant.OrderStatus.*;
 import static cn.stylefeng.guns.modular.system.constant.PayApiEnum.FLOW_NOT_EXIST;
 import static cn.stylefeng.guns.modular.system.constant.PayApiEnum.UN_KNOW_ERROR;
 
@@ -82,8 +81,8 @@ public class TradeServiceImpl extends ServiceImpl<TradeMapper, Trade> implements
     }
 
     @Override
-    public List<Trade> findTradeInfoWithInvalidOverTime() {
-        return tradeMapper.findTradeInfoWithInvalidOverTime();
+    public List<Trade> findTradeInfoWithInvalidOverTime(Integer num) {
+        return tradeMapper.findTradeInfoWithInvalidOverTime(num);
     }
 
 
@@ -115,12 +114,36 @@ public class TradeServiceImpl extends ServiceImpl<TradeMapper, Trade> implements
     @Transactional
     @Override
     public void invalidOrder(String orderNo){
-        Integer row = tradeMapper.matchOrder(orderNo,ORDER_STATUS_SUCCESS);
+        Integer row = tradeMapper.matchOrder(orderNo,ORDER_STATUS_OVERDUE);
         if(row == 0){
             logger.info("invalidOrder失败 可能是多线程并发,订单已经被匹配或者订单已经失效!!! " +
                     "orderNo = {} ,orderInfo = {} ",orderNo);
             return;
         }
     }
-    
+
+    @Override
+    public List<Trade> findNeedAcountChangeOrders(Integer num) {
+        return tradeMapper.findNeedAcountChangeOrders(num);
+    }
+
+    @Transactional
+    @Override
+    public void handleAccountChange(Trade trade) {
+        if(StringUtils.isEmpty(trade)){
+            return;
+        }
+        Integer row = tradeMapper.execAccountChange(trade.getOrderNo());
+        if(row == 0){
+            logger.info("orderNo:{} has finished account",trade.getOrderNo());
+            return;
+        }
+        if(trade.getOrderStatus() == ORDER_STATUS_SUCCESS){
+            logger.info("orderNo:{} successfully，execute normal cash flow!!",trade.getOrderNo());
+        }
+        else if(trade.getOrderStatus() == ORDER_STATUS_OVERDUE){
+            logger.info("orderNo:{} overdue，execute rollback cash flow!!",trade.getOrderNo());
+        }
+    }
+
 }
