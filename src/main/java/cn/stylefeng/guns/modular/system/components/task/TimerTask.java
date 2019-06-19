@@ -23,6 +23,8 @@ import java.util.List;
 
 import static cn.stylefeng.guns.modular.system.constant.Constant.Lock.ACCOUNT_CHANGE_LOCK_PREFIX;
 import static cn.stylefeng.guns.modular.system.constant.Constant.Lock.TRADE_INVALID_OVERTIME_LOCK_PREFIX;
+import static cn.stylefeng.guns.modular.system.constant.Constant.ORDER_ACCOUNT_HANDLE_MAX;
+import static cn.stylefeng.guns.modular.system.constant.Constant.ORDER_OVERDUE_HANDLE_MAX;
 import static cn.stylefeng.guns.modular.system.constant.Constant.OrderStatus.ORDER_STATUS_SUCCESS;
 import static cn.stylefeng.guns.modular.system.constant.PayApiEnum.BANK_CARD_LOCK_FAILED;
 import static cn.stylefeng.guns.modular.system.constant.PayApiEnum.LOCK_TIMEOUT;
@@ -76,7 +78,7 @@ public class TimerTask {
         try {
             /*添加分佈式鎖*/
             if (redisDistributedLock.lock(ACCOUNT_CHANGE_LOCK_PREFIX)){
-                List<Trade> list = iTradeService.findNeedAcountChangeOrders(num);
+                List<Trade> list = iTradeService.findNeedAcountChangeOrders(ORDER_ACCOUNT_HANDLE_MAX);
                 if (StringUtils.isNotEmpty(list)){
                     logger.info("执行帳變處理定时任务");
                     logger.info("总共【{}】条需要處理帳變的订单",list.size());
@@ -108,7 +110,7 @@ public class TimerTask {
         try {
             /*添加分佈式鎖*/
             if (redisDistributedLock.lock(TRADE_INVALID_OVERTIME_LOCK_PREFIX)){
-                List<Trade> list = iTradeService.findTradeInfoWithInvalidOverTime();
+                List<Trade> list = iTradeService.findTradeInfoWithInvalidOverTime(ORDER_OVERDUE_HANDLE_MAX);
                 if (StringUtils.isNotEmpty(list)){
                     logger.info("执行异常超时订单定时任务");
                     logger.info("总共【{}】条异常超时订单",list.size());
