@@ -18,7 +18,7 @@ import java.util.Date;
 public class FlowNotifyReq {
     @NotNull(message = "scalper_id不能为空！")
     @JSONField(name = "scalper_id")
-    private Integer scalper_id;
+    private String scalper_id;
 
     @NotNull(message = "channel不能为空！")
     @JSONField(name = "channel")

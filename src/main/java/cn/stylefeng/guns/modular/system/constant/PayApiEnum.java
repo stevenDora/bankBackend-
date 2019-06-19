@@ -43,7 +43,11 @@ public enum PayApiEnum implements AbstractBaseExceptionEnum {
     MSG_COMMUNICATE_ERROR(487,"消息通讯异常！！"),
     FLOW_FAILED_SIGN(488,"流水推送验签失败！！"),
     UN_KNOW_ERROR(499,"未知错误！！"),
-    DEPOSIT_APPLY_SUCCESS(200,"申请充值成功！！");
+    FLOW_NOT_EXIST(500,"流水不存在异常！！"),
+    SCALPER_NOT_FOUND(501,"收款人不存在！！"),
+    CHANNEL_NOT_FOUND(502,"渠道不存在！！"),
+    DEPOSIT_APPLY_SUCCESS(200,"申请充值成功！！"),
+    FLOW_SUBMIT_SUCCESS(201,"流水提交成功！！");
 
 
     private String desc;

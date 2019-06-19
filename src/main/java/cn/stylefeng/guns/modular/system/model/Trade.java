@@ -38,6 +38,9 @@ public class Trade extends Model<Trade> {
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
+    @TableField(value = "scalper_id")
+    private Long scalperId;
+
     /**
     *  账号Id
     */

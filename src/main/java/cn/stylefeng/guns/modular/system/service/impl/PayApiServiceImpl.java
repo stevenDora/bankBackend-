@@ -10,25 +10,18 @@ import cn.stylefeng.guns.modular.system.service.*;
 import cn.stylefeng.guns.modular.system.utils.DateUtil;
 import cn.stylefeng.guns.modular.system.utils.StringUtils;
 import cn.stylefeng.roses.kernel.model.exception.ServiceException;
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.baomidou.mybatisplus.mapper.EntityWrapper;
-import com.sun.javafx.collections.MappingChange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.RequestParam;
-
-import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import static cn.stylefeng.guns.modular.system.constant.Constant.MessageRoute.MSG_ROUTE_FLOW;
 import static cn.stylefeng.guns.modular.system.constant.Constant.MessageRoute.MSG_ROUTE_ORDER;
 import static cn.stylefeng.guns.modular.system.constant.Constant.OrderStatus.*;
 import static cn.stylefeng.guns.modular.system.constant.Constant.RedisOrderPrefix.ORDER_DETAIL;
@@ -199,10 +192,22 @@ public class PayApiServiceImpl implements PayApiService {
 
     @Transactional
     @Override
-    public Object notify(FlowNotifyReq flowNotifyReq) {
-        scalperService.selectByMap()
-        flowDataService.save(flowNotifyReq);
-        return null;
+    public Object notify(FlowNotifyReq req) {
+        Map<String, Object> scalperInfo = scalperService.findScalperByScalperId(req.getScalper_id());
+        if(StringUtils.isEmpty(scalperInfo)){
+            throw new ServiceException(SCALPER_NOT_FOUND);
+        }
+        if(req.getChannel()!=1&&req.getChannel()!=2&&req.getChannel()!=3){
+            throw new ServiceException(CHANNEL_NOT_FOUND);
+        }
+        Integer flowNo = flowDataService.save(req);
+        Map<String,Integer> msg = new HashMap<>();
+        msg.put("flowNo",flowNo);
+        mqSender.sendMsg(JSONObject.toJSONString(msg),MSG_ROUTE_FLOW);
+        return ResponseResult.builder()
+                .data(req)
+                .code(FLOW_SUBMIT_SUCCESS.getCode())
+                .msg(FLOW_SUBMIT_SUCCESS.getDesc()).build();
     }
 
     /*private boolean syncTradeToRedis(String orderNo) {

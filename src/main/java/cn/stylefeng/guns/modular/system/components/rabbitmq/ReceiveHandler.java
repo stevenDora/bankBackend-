@@ -6,6 +6,7 @@ import cn.stylefeng.guns.modular.system.dto.*;
 import cn.stylefeng.guns.modular.system.model.Trade;
 import cn.stylefeng.guns.modular.system.service.IBankCardService;
 import cn.stylefeng.guns.modular.system.service.IBankRemarkService;
+import cn.stylefeng.guns.modular.system.service.IFlowDataService;
 import cn.stylefeng.guns.modular.system.service.ITradeService;
 import cn.stylefeng.guns.modular.system.utils.StringUtils;
 import cn.stylefeng.roses.kernel.model.exception.ServiceException;
@@ -70,6 +71,28 @@ public class ReceiveHandler {
             e.printStackTrace();
         }
     }
+
+
+    @RabbitListener(queues = {RabbitMQConfig.QUEUE_FLOW_PROCESS})
+    public void matchFlowHandler(String msg,Message message,
+                             Channel channel){
+        try {
+            logger.info("receive raw message is {}",msg);
+            Map map = JSON.parseObject(msg, Map.class);
+            Integer flowNo =(Integer)map.get("flowNo");
+
+            if(StringUtils.isEmpty(flowNo)
+                    ||StringUtils.isEmpty(flowNo))
+                throw new ServiceException(MSG_COMMUNICATE_ERROR);
+
+            //上分匹配逻辑
+            tradeService.matchOrder(flowNo);
+            channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 
 
 }

@@ -54,6 +54,7 @@ public class Constant {
 
     public interface MessageRoute{
         String MSG_ROUTE_ORDER = "MSG_ROUTE_ORDER";
+        String MSG_ROUTE_FLOW = "MSG_ROUTE_FLOW";
     }
 
 

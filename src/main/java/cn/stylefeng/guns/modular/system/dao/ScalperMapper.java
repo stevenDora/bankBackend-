@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Select;
 
 import java.math.BigDecimal;
+import java.util.Map;
 
 /**
  * <p>
@@ -19,4 +20,10 @@ public interface ScalperMapper extends BaseMapper<Scalper> {
     String findBestScalper(Integer channel, BigDecimal amount);
 
     Integer updateScalperAccount(String scalper_id, BigDecimal amount);
+
+    @Select("select id,scalper_id,avaliable_balance,freeze_balance," +
+            "total_balance,collect_balance_sum_day,collect_balance_max_day," +
+            "last_assign_task_time,last_account_time,last_charge_time,last_flow_push_time,alipay_switch" +
+            "wx_switch,bank_switch,block_status,alipay_rate,wx_rate,bank_rate from scalper where scalper_id=#{scalper_id}")
+    Map findScalperByScalperId(String scalper_id);
 }

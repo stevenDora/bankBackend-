@@ -23,4 +23,28 @@
         id, scalper_id, channel, amount, remark, from_ip, receive_time, data, order_no, is_matched, crt_time, upt_time
     </sql>
 
+
+    <insert id="save" parameterType="cn.stylefeng.guns.modular.system.dto.FlowNotifyReq"
+            useGeneratedKeys="true" keyProperty="id">
+            insert into
+            flow_data
+            (
+            scalper_id,
+            channel,
+            amount,
+            remark,
+            from_ip,
+            receive_time
+            )
+            values
+            (
+            #{scalper_id},
+            #{channel},
+            #{amount},
+            #{remark}
+            #{from_ip}
+            #{receive_time}
+            )
+    </insert>
+
 </mapper>

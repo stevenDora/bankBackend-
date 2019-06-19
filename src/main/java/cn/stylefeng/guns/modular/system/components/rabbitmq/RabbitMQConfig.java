@@ -9,6 +9,7 @@ import org.springframework.boot.autoconfigure.amqp.SimpleRabbitListenerContainer
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import static cn.stylefeng.guns.modular.system.constant.Constant.MessageRoute.MSG_ROUTE_FLOW;
 import static cn.stylefeng.guns.modular.system.constant.Constant.MessageRoute.MSG_ROUTE_ORDER;
 
 /**
@@ -23,6 +24,10 @@ public class RabbitMQConfig {
 
     //处理队列
     public static final String QUEUE_ORDER_PROCESS = "queue_order_process";
+
+
+    //处理队列
+    public static final String QUEUE_FLOW_PROCESS = "queue_flow_process";
 
     //路由
 
@@ -46,14 +51,22 @@ public class RabbitMQConfig {
     public Exchange EX_MEDIA_VIDEOTASK() {
         return ExchangeBuilder.directExchange(EX_PROCESSTASK).durable(true).build();
     }
-    //声明队列
+    //声明队列 QUEUE_ORDER_PROCESS
     @Bean("QUEUE_ORDER_PROCESS")
-    public Queue QUEUE_PROCESSTASK() {
+    public Queue QUEUE_ORDER_PROCESS_TASK() {
         Queue queue = new Queue(QUEUE_ORDER_PROCESS,true,false,true);
         return queue;
     }
+
+    //声明队列 QUEUE_FLOW_PROCESS
+    @Bean("QUEUE_FLOW_PROCESS")
+    public Queue QUEUE_FLOW_PROCESS_TASK() {
+        Queue queue = new Queue(QUEUE_FLOW_PROCESS,true,false,true);
+        return queue;
+    }
+
     /**
-     * 绑定队列到交换机 .
+     * 绑定 QUEUE_ORDER_PROCESS 队列到交换机 .
      * @param queue    the queue
      * @param exchange the exchange
      * @return the binding
@@ -62,5 +75,18 @@ public class RabbitMQConfig {
     public Binding binding_queue_order_processtask(@Qualifier("QUEUE_ORDER_PROCESS") Queue queue, @Qualifier(EX_PROCESSTASK) Exchange exchange) {
         return BindingBuilder.bind(queue).to(exchange).with(MSG_ROUTE_ORDER).noargs();
     }
+
+    /**
+     * 绑定 QUEUE_FLOW_PROCESS 队列到交换机 .
+     * @param queue    the queue
+     * @param exchange the exchange
+     * @return the binding
+     */
+    @Bean
+    public Binding binding_queue_flow_processtask(@Qualifier("QUEUE_FLOW_PROCESS") Queue queue, @Qualifier(EX_PROCESSTASK) Exchange exchange) {
+        return BindingBuilder.bind(queue).to(exchange).with(MSG_ROUTE_FLOW).noargs();
+    }
+
+
 }
 
