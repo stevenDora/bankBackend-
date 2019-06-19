@@ -88,7 +88,7 @@ public class TradeServiceImpl extends ServiceImpl<TradeMapper, Trade> implements
 
     @Override
     @Transactional
-    public void matchOrder(Integer flowNo){
+    public void handleSucOrder(Integer flowNo){
         FlowData flowData  = flowDataService.getFlowDataById(flowNo);
         if(StringUtils.isEmpty(flowData)){
             throw new ServiceException(FLOW_NOT_EXIST);
@@ -143,6 +143,9 @@ public class TradeServiceImpl extends ServiceImpl<TradeMapper, Trade> implements
         }
         else if(trade.getOrderStatus() == ORDER_STATUS_OVERDUE){
             logger.info("orderNo:{} overdue，execute rollback cash flow!!",trade.getOrderNo());
+        }
+        else {
+            throw new ServiceException(UN_KNOW_ERROR);
         }
     }
 

@@ -86,7 +86,7 @@ public class ReceiveHandler {
                 throw new ServiceException(MSG_COMMUNICATE_ERROR);
 
             //上分匹配逻辑
-            tradeService.matchOrder(flowNo);
+            tradeService.handleSucOrder(flowNo);
             channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
         } catch (IOException e) {
             e.printStackTrace();

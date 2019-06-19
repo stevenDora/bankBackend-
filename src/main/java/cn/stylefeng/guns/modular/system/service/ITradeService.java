@@ -17,7 +17,7 @@ public interface ITradeService extends IService<Trade> {
 
     Trade selectTradeByOrderNo(String orderNo);
 
-    void matchOrder(Integer flowNo);
+    void handleSucOrder(Integer flowNo);
 
     void createOrder(String orderNo);
 
