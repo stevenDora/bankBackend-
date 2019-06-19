@@ -6,7 +6,6 @@ import com.baomidou.mybatisplus.annotations.TableField;
 import com.baomidou.mybatisplus.activerecord.Model;
 import com.baomidou.mybatisplus.annotations.TableId;
 import com.baomidou.mybatisplus.enums.IdType;
-import io.swagger.models.auth.In;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -39,7 +38,7 @@ public class Trade extends Model<Trade> {
     private Long id;
 
     @TableField(value = "scalper_id")
-    private Long scalperId;
+    private String scalperId;
 
     /**
     *  账号Id

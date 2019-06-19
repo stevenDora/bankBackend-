@@ -23,7 +23,9 @@ public class Constant {
 
     public interface Lock{
         String CASH_FLOW_LOCK_PREFIX = "cash_flow_lock_prefix";
-
+        String TRADE_INVALID_OVERTIME_LOCK_PREFIX = "trade_invalid_overtime_lock_prefix";
+        String TRADE_ORDER_STATUS_LOCK_PREFIX = "trade_order_status_lock_prefix";
+        String SCALPER_LOCK_PREFIX = "scalper_lock_prefix";
     }
 
     public interface Channel{

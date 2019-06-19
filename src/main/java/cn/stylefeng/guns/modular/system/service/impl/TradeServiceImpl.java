@@ -18,7 +18,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 import static cn.stylefeng.guns.modular.system.constant.Constant.OrderStatus.ORDER_STATUS_PROCESS;
+import static cn.stylefeng.guns.modular.system.constant.Constant.OrderStatus.ORDER_STATUS_SUCCESS;
 import static cn.stylefeng.guns.modular.system.constant.PayApiEnum.FLOW_NOT_EXIST;
 import static cn.stylefeng.guns.modular.system.constant.PayApiEnum.UN_KNOW_ERROR;
 
@@ -78,6 +81,11 @@ public class TradeServiceImpl extends ServiceImpl<TradeMapper, Trade> implements
         redisDao.set(orderNo, JSONObject.toJSONString(trade));
     }
 
+    @Override
+    public List<Trade> findTradeInfoWithInvalidOverTime() {
+        return tradeMapper.findTradeInfoWithInvalidOverTime();
+    }
+
 
     @Override
     @Transactional
@@ -93,10 +101,24 @@ public class TradeServiceImpl extends ServiceImpl<TradeMapper, Trade> implements
             logger.info("可能是多线程并发,flowNo = {} 已经被匹配!!!",flowNo);
             return;
         }
-        row = tradeMapper.matchOrder(trade.getOrderNo());
+        row = tradeMapper.matchOrder(trade.getOrderNo(),ORDER_STATUS_SUCCESS);
         if(row == 0){
             logger.info("可能是多线程并发,订单已经被匹配或者订单已经失效!!! " +
                             "orderNo = {} ,orderInfo = {} ",trade.getOrderNo(),trade.toString());
+            return;
+        }
+        logger.info("订单匹配成功,打上做账标记!!! " +
+                "orderNo = {} ,orderInfo = {} ",trade.getOrderNo(),trade.toString());
+    }
+
+
+    @Transactional
+    @Override
+    public void invalidOrder(String orderNo){
+        Integer row = tradeMapper.matchOrder(orderNo,ORDER_STATUS_SUCCESS);
+        if(row == 0){
+            logger.info("invalidOrder失败 可能是多线程并发,订单已经被匹配或者订单已经失效!!! " +
+                    "orderNo = {} ,orderInfo = {} ",orderNo);
             return;
         }
     }
