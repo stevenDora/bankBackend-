@@ -14,6 +14,7 @@ import java.math.BigDecimal;
 @Builder
 public class AccountSelectRsp {
     private String orderNo;
+    private String scalper_id;
     private Boolean isSuc;
     private BigDecimal amount;
     private Integer channel;

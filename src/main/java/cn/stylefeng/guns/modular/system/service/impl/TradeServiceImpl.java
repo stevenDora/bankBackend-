@@ -84,10 +84,15 @@ public class TradeServiceImpl extends ServiceImpl<TradeMapper, Trade> implements
         trade.setOrderStatus(ORDER_STATUS_PROCESS);
         AccountSelectRsp rsp = assignOrderService.accountSelect(trade);
 
-        trade.setRemark(rsp.getRemark());
-        trade.setAccountId(rsp.getAccount_id());
-        trade.setAccountInfo(rsp.getAccount_info());
-
+        if(!StringUtils.isEmpty(rsp)&&
+                !StringUtils.isEmpty(rsp.getAccount_info())){
+            trade.setRemark(rsp.getRemark());
+            trade.setAccountId(rsp.getAccount_id());
+            trade.setAccountInfo(rsp.getAccount_info());
+            trade.setScalperId(rsp.getScalper_id());
+            logger.info("assign order failed,empty orderNo:{},companyOrderNo:{}",
+                    orderNo,trade.getCompanyOrderNo());
+        }
         tradeMapper.insert(trade);
         redisDao.set(orderNo, JSONObject.toJSONString(trade));
     }

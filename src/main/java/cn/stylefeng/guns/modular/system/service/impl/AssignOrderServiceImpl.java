@@ -18,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
@@ -77,7 +78,8 @@ public class AssignOrderServiceImpl implements AssignOrderService {
             if(StringUtils.isEmpty(scalper_id)){
                 logger.info("select scalper failed,nobody find channel:{},amount:{},orderNo{} !!!",
                         channel,amount,orderNo);
-                throw new ServiceException(ACCOUNT_SELECT_FAILED);
+                //throw new ServiceException(ACCOUNT_SELECT_FAILED);
+                return null;
             }
             //查询账户信息
             if(channel == CHANNEL_ALIPAY){
@@ -97,9 +99,11 @@ public class AssignOrderServiceImpl implements AssignOrderService {
                 else {
                     SelectCardRsp data = (SelectCardRsp) result.getData();
                     accountSelectRsp.setAccount_id(data.getAccount_id());
+                    accountSelectRsp.setScalper_id(scalper_id);
                     accountSelectRsp.setAccount_info(data.getName().trim()+"#"+data.getCardNo().trim());
                     if(StringUtils.isEmpty(accountSelectRsp.getAccount_info())){
-                        throw new ServiceException(ACCOUNT_SELECT_FAILED);
+                        logger.info("account info is abnormal");
+                        return null;
                     }
                 }
             }
@@ -126,6 +130,7 @@ public class AssignOrderServiceImpl implements AssignOrderService {
             accountSelectRsp.setIsSuc(false);
             accountSelectRsp.setAccount_info("");
             accountSelectRsp.setAccount_id(null);
+            accountSelectRsp.setScalper_id(null);
         }
 
         //2)生成附言
@@ -152,10 +157,8 @@ public class AssignOrderServiceImpl implements AssignOrderService {
                 locked = false;
                 logger.info("该商户已被其他进程锁定，请等待操作");
                 isAssignSuc = false;
-                throw new ServiceException(LOCK_TIMEOUT);
             }
         }catch (Exception e){
-            isAssignSuc = false;
             throw new ServiceException(UN_KNOW_ERROR);
         }finally {
             logger.info("釋放分布式锁");
