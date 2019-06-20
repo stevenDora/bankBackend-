@@ -109,7 +109,7 @@ public class AssignOrderServiceImpl implements AssignOrderService {
                 accountSelectRsp.setIsSuc(false);
             }
             else {
-                if(updateScalperAccount(trade) > 0){
+                if(assignToScalper(trade)){
                     accountSelectRsp.setIsSuc(true);
                 }
                 else {
@@ -139,10 +139,10 @@ public class AssignOrderServiceImpl implements AssignOrderService {
         return accountSelectRsp;
     }
 
-    private Integer updateScalperAccount(Trade trade) {
+    private Boolean assignToScalper(Trade trade) {
         boolean locked = true;
+        boolean isAssignSuc = true;
         String scalper_id = trade.getScalperId();
-        BigDecimal amount = trade.getApplyAmount();
         String locker = redisDao.getKey(SCALPER_LOCK_PREFIX, scalper_id);
         try{
             if (redisDistributedLock.lock(locker)) {
@@ -151,15 +151,17 @@ public class AssignOrderServiceImpl implements AssignOrderService {
             else {
                 locked = false;
                 logger.info("该商户已被其他进程锁定，请等待操作");
+                isAssignSuc = false;
                 throw new ServiceException(LOCK_TIMEOUT);
             }
         }catch (Exception e){
+            isAssignSuc = false;
             throw new ServiceException(UN_KNOW_ERROR);
         }finally {
             logger.info("釋放分布式锁");
             redisDistributedLock.unlock(locker, locked);
         }
-        return 1;
+        return isAssignSuc;
     }
 
     private String findBestScalper(Integer channel, BigDecimal amount) {
