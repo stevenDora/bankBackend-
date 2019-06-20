@@ -1,8 +1,10 @@
 package cn.stylefeng.guns.modular.system.service;
 
 import cn.stylefeng.guns.modular.system.model.Scalper;
+import cn.stylefeng.guns.modular.system.model.Trade;
 import com.baomidou.mybatisplus.service.IService;
 
+import java.math.BigDecimal;
 import java.util.Map;
 
 /**
@@ -15,5 +17,9 @@ import java.util.Map;
  */
 public interface IScalperService extends IService<Scalper> {
 
-    public Map<String,Object> findScalperByScalperId(String scalper_id);
+    public Scalper findScalperByScalperId(String scalper_id);
+
+    void saveScalperCashFlow(Trade trade);
+
+    String findBestScalper(Integer channel, BigDecimal amount);
 }

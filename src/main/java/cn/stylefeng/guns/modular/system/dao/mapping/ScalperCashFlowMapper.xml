@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.stylefeng.guns.modular.system.dao.ScalperCashFlowMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="cn.stylefeng.guns.modular.system.model.ScalperCashFlow">
+        <id column="id" property="id" />
+        <result column="scalper_id" property="scalperId" />
+        <result column="collection_amount" property="collectionAmount" />
+        <result column="payment_amount" property="paymentAmount" />
+        <result column="collection_earning" property="collectionEarning" />
+        <result column="payment_earning" property="paymentEarning" />
+        <result column="updated_ab" property="updatedAb" />
+        <result column="old_ab" property="oldAb" />
+        <result column="updated_fa" property="updatedFa" />
+        <result column="old_fa" property="oldFa" />
+        <result column="transaction_time" property="transactionTime" />
+        <result column="order_no" property="orderNo" />
+        <result column="order_status" property="orderStatus" />
+        <result column="crt_time" property="crtTime" />
+        <result column="upt_time" property="uptTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, scalper_id, collection_amount, payment_amount, collection_earning, payment_earning, updated_ab, old_ab, updated_fa, old_fa, transaction_time, order_no, order_status, crt_time, upt_time
+    </sql>
+
+</mapper>

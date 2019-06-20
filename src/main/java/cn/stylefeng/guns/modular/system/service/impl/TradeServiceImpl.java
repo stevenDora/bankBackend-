@@ -1,13 +1,12 @@
 package cn.stylefeng.guns.modular.system.service.impl;
 
 import cn.stylefeng.guns.modular.system.components.redis.RedisDao;
+import cn.stylefeng.guns.modular.system.components.redis.impl.RedisDistributedLock;
+import cn.stylefeng.guns.modular.system.constant.Constant;
+import cn.stylefeng.guns.modular.system.dao.*;
 import cn.stylefeng.guns.modular.system.dto.AccountSelectRsp;
-import cn.stylefeng.guns.modular.system.model.FlowData;
-import cn.stylefeng.guns.modular.system.model.Trade;
-import cn.stylefeng.guns.modular.system.dao.TradeMapper;
-import cn.stylefeng.guns.modular.system.service.AssignOrderService;
-import cn.stylefeng.guns.modular.system.service.IFlowDataService;
-import cn.stylefeng.guns.modular.system.service.ITradeService;
+import cn.stylefeng.guns.modular.system.model.*;
+import cn.stylefeng.guns.modular.system.service.*;
 import cn.stylefeng.guns.modular.system.utils.StringUtils;
 import cn.stylefeng.roses.kernel.model.exception.ServiceException;
 import com.alibaba.fastjson.JSONObject;
@@ -18,11 +17,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
+import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
+import static cn.stylefeng.guns.modular.system.constant.Constant.COMPANY_CASH_OWNER;
+import static cn.stylefeng.guns.modular.system.constant.Constant.Lock.COMPANY_LOCK_PREFIX;
+import static cn.stylefeng.guns.modular.system.constant.Constant.Lock.SCALPER_LOCK_PREFIX;
 import static cn.stylefeng.guns.modular.system.constant.Constant.OrderStatus.*;
-import static cn.stylefeng.guns.modular.system.constant.PayApiEnum.FLOW_NOT_EXIST;
-import static cn.stylefeng.guns.modular.system.constant.PayApiEnum.UN_KNOW_ERROR;
+import static cn.stylefeng.guns.modular.system.constant.Constant.SCALPER_CASH_OWNER;
+import static cn.stylefeng.guns.modular.system.constant.PayApiEnum.*;
 
 /**
  * <p>
@@ -38,11 +44,12 @@ public class TradeServiceImpl extends ServiceImpl<TradeMapper, Trade> implements
 
     private static Logger logger = LoggerFactory.getLogger(TradeServiceImpl.class);
 
-
+    @Resource
+    private RedisDistributedLock redisDistributedLock;
 
     @Autowired
     private TradeMapper tradeMapper;
-    
+
     @Autowired
     private IFlowDataService flowDataService;
 
@@ -51,6 +58,12 @@ public class TradeServiceImpl extends ServiceImpl<TradeMapper, Trade> implements
 
     @Autowired
     private AssignOrderService assignOrderService;
+
+    @Autowired
+    private IScalperService scalperService;
+
+    @Autowired
+    private CompanyService companyService;
 
     @Override
     public Trade selectTradeByOrderNo(String orderNo) {
@@ -68,14 +81,13 @@ public class TradeServiceImpl extends ServiceImpl<TradeMapper, Trade> implements
             throw new ServiceException(UN_KNOW_ERROR);
         }
         Trade trade = JSONObject.parseObject(orderStr, Trade.class);
-        AccountSelectRsp rsp = assignOrderService.accountSelect(orderNo,
-                trade.getChannel(),
-                trade.getApplyAmount());
+        trade.setOrderStatus(ORDER_STATUS_PROCESS);
+        AccountSelectRsp rsp = assignOrderService.accountSelect(trade);
 
         trade.setRemark(rsp.getRemark());
         trade.setAccountId(rsp.getAccount_id());
         trade.setAccountInfo(rsp.getAccount_info());
-        trade.setOrderStatus(ORDER_STATUS_PROCESS);
+
         tradeMapper.insert(trade);
         redisDao.set(orderNo, JSONObject.toJSONString(trade));
     }
@@ -146,6 +158,37 @@ public class TradeServiceImpl extends ServiceImpl<TradeMapper, Trade> implements
         }
         else {
             throw new ServiceException(UN_KNOW_ERROR);
+        }
+        saveCashFlow(trade,COMPANY_CASH_OWNER,trade.getCompanyNo()+"",COMPANY_LOCK_PREFIX);
+        saveCashFlow(trade,SCALPER_CASH_OWNER,trade.getScalperId(),SCALPER_LOCK_PREFIX);
+    }
+
+
+    @Override
+    @Transactional
+    public void saveCashFlow(Trade trade,String cashOwner,String lockId,String lockPrefix){
+        boolean locked = true;
+        String locker = redisDao.getKey(lockPrefix, lockId);
+        try{
+            if (redisDistributedLock.lock(locker)) {
+                if(cashOwner.equals(COMPANY_CASH_OWNER)){
+                    companyService.saveCompanyCashFlow(trade);
+                }
+                else {
+                    scalperService.saveScalperCashFlow(trade);
+                }
+
+            }
+            else {
+                locked = false;
+                logger.info("该商户已被其他进程锁定，请等待操作");
+                throw new ServiceException(LOCK_TIMEOUT);
+            }
+        }catch (Exception e){
+            throw new ServiceException(UN_KNOW_ERROR);
+        }finally {
+            logger.info("釋放分布式锁");
+            redisDistributedLock.unlock(locker, locked);
         }
     }
 

@@ -28,4 +28,6 @@ public interface ITradeService extends IService<Trade> {
     List<Trade> findNeedAcountChangeOrders(Integer num);
 
     void handleAccountChange(Trade trade);
+
+    void saveCashFlow(Trade trade,String cashOwner,String lockId,String lockPrefix);
 }

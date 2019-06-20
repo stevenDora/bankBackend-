@@ -63,7 +63,7 @@ public class ReceiveHandler {
                     ||StringUtils.isEmpty(orderNo))
                 throw new ServiceException(MSG_COMMUNICATE_ERROR);
 
-            if(op==CREATE_ORDER){
+            if(op == CREATE_ORDER){
                 tradeService.createOrder(orderNo);
             }
             channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);

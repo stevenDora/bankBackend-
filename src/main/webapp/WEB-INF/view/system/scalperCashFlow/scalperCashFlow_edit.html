@@ -1,0 +1,40 @@
+@layout("/common/_container.html"){
+<div class="ibox float-e-margins">
+    <div class="ibox-content">
+        <div class="form-horizontal">
+
+            <div class="row">
+                <div class="col-sm-6 b-r">
+                            <#input id="id" name="" value="${item.id}" underline="true"/>
+                            <#input id="scalperId" name="" value="${item.scalperId}" underline="true"/>
+                            <#input id="collectionAmount" name="代收金额" value="${item.collectionAmount}" underline="true"/>
+                            <#input id="paymentAmount" name="代付金额" value="${item.paymentAmount}" underline="true"/>
+                            <#input id="collectionEarning" name="代收收益" value="${item.collectionEarning}" underline="true"/>
+                            <#input id="paymentEarning" name="代付收益" value="${item.paymentEarning}" underline="true"/>
+                            <#input id="updatedAb" name="新可用余额" value="${item.updatedAb}" underline="true"/>
+                            <#input id="oldAb" name="旧可用余额" value="${item.oldAb}" />
+                </div>
+
+                <div class="col-sm-6">
+                            <#input id="updatedFa" name="新冻结金额" value="${item.updatedFa}" underline="true"/>
+                            <#input id="oldFa" name="旧冻结金额" value="${item.oldFa}" underline="true"/>
+                            <#input id="transactionTime" name="" value="${item.transactionTime}" underline="true"/>
+                            <#input id="orderNo" name="" value="${item.orderNo}" underline="true"/>
+                            <#input id="orderStatus" name="" value="${item.orderStatus}" underline="true"/>
+                            <#input id="crtTime" name="" value="${item.crtTime}" underline="true"/>
+                            <#input id="uptTime" name="" value="${item.uptTime}" />
+                </div>
+            </div>
+
+            <div class="row btn-group-m-t">
+                <div class="col-sm-10">
+                    <#button btnCss="info" name="提交" id="ensure" icon="fa-check" clickFun="ScalperCashFlowInfoDlg.editSubmit()"/>
+                    <#button btnCss="danger" name="取消" id="cancel" icon="fa-eraser" clickFun="ScalperCashFlowInfoDlg.close()"/>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+<script src="${ctxPath}/static/modular/system/scalperCashFlow/scalperCashFlow_info.js"></script>
+@}

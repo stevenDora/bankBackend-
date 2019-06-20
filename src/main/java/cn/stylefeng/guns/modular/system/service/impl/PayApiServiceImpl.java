@@ -5,6 +5,7 @@ import cn.stylefeng.guns.modular.system.components.rabbitmq.MQSender;
 import cn.stylefeng.guns.modular.system.components.redis.RedisDao;
 import cn.stylefeng.guns.modular.system.constant.PayApiEnum;
 import cn.stylefeng.guns.modular.system.dto.*;
+import cn.stylefeng.guns.modular.system.model.Scalper;
 import cn.stylefeng.guns.modular.system.model.Trade;
 import cn.stylefeng.guns.modular.system.service.*;
 import cn.stylefeng.guns.modular.system.utils.DateUtil;
@@ -193,7 +194,7 @@ public class PayApiServiceImpl implements PayApiService {
     @Transactional
     @Override
     public Object notify(FlowNotifyReq req) {
-        Map<String, Object> scalperInfo = scalperService.findScalperByScalperId(req.getScalper_id());
+        Scalper scalperInfo = scalperService.findScalperByScalperId(req.getScalper_id());
         if(StringUtils.isEmpty(scalperInfo)){
             throw new ServiceException(SCALPER_NOT_FOUND);
         }

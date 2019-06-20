@@ -38,7 +38,8 @@ public interface TradeMapper extends BaseMapper<Trade> {
     List<Trade> findTradeInfoWithInvalidOverTime(Integer num);
 
 
-    @Select("select order_no,order_status from t_dora_trade where order_status in (2,3) " +
+    @Select("select scalper_id,order_no,order_status ,companyNo," +
+            "apply_amount,actual_amount from t_dora_trade where order_status in (2,3) " +
             "and account_change = 1 limit #{num}")
     @ResultType(cn.stylefeng.guns.modular.system.model.Trade.class)
     List<Trade> findNeedAcountChangeOrders(Integer num);

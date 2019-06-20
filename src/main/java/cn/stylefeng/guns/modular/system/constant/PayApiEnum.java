@@ -47,6 +47,8 @@ public enum PayApiEnum implements AbstractBaseExceptionEnum {
     SCALPER_NOT_FOUND(501,"收款人不存在！！"),
     CHANNEL_NOT_FOUND(502,"渠道不存在！！"),
     LOCK_TIMEOUT(503,"獲取鎖超時！！"),
+    SAVE_COMPANY_CASH_FLOW_ERROR(504,"写入商户帐变异常！！"),
+    SAVE_SCALPER_CASH_FLOW_ERROR(505,"写入收款人帐变异常！！"),
     DEPOSIT_APPLY_SUCCESS(200,"申请充值成功！！"),
     FLOW_SUBMIT_SUCCESS(201,"流水提交成功！！");
 

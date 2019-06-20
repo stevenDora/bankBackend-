@@ -1,0 +1,40 @@
+@layout("/common/_container.html"){
+<div class="ibox float-e-margins">
+    <div class="ibox-content">
+        <div class="form-horizontal">
+
+            <div class="row">
+                <div class="col-sm-6 b-r">
+                            <#input id="id" name="" value="${item.id}" underline="true"/>
+                            <#input id="companyId" name="" value="${item.companyId}" underline="true"/>
+                            <#input id="collectionAmount" name="玩家充值金额" value="${item.collectionAmount}" underline="true"/>
+                            <#input id="paymentAmount" name="玩家提现金额" value="${item.paymentAmount}" underline="true"/>
+                            <#input id="collectionBfs" name="玩家充值商户手续费" value="${item.collectionBfs}" underline="true"/>
+                            <#input id="paymentBfs" name="玩家提现商户手续费" value="${item.paymentBfs}" underline="true"/>
+                            <#input id="updatedAb" name="新可以用余额" value="${item.updatedAb}" underline="true"/>
+                            <#input id="oldAb" name="旧可用余额" value="${item.oldAb}" />
+                </div>
+
+                <div class="col-sm-6">
+                            <#input id="updatedFa" name="新冻结金额" value="${item.updatedFa}" underline="true"/>
+                            <#input id="oldFa" name="旧冻结金额" value="${item.oldFa}" underline="true"/>
+                            <#input id="transactionDate" name="" value="${item.transactionDate}" underline="true"/>
+                            <#input id="orderNo" name="" value="${item.orderNo}" underline="true"/>
+                            <#input id="crtTime" name="" value="${item.crtTime}" underline="true"/>
+                            <#input id="uptTime" name="" value="${item.uptTime}" underline="true"/>
+                            <#input id="orderStatus" name="订单状态" value="${item.orderStatus}" />
+                </div>
+            </div>
+
+            <div class="row btn-group-m-t">
+                <div class="col-sm-10">
+                    <#button btnCss="info" name="提交" id="ensure" icon="fa-check" clickFun="CompanyCashFlowInfoDlg.editSubmit()"/>
+                    <#button btnCss="danger" name="取消" id="cancel" icon="fa-eraser" clickFun="CompanyCashFlowInfoDlg.close()"/>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+<script src="${ctxPath}/static/modular/system/companyCashFlow/companyCashFlow_info.js"></script>
+@}

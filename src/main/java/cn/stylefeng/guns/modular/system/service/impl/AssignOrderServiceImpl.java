@@ -1,13 +1,17 @@
 package cn.stylefeng.guns.modular.system.service.impl;
 
+import cn.stylefeng.guns.modular.system.components.redis.RedisDao;
+import cn.stylefeng.guns.modular.system.components.redis.impl.RedisDistributedLock;
 import cn.stylefeng.guns.modular.system.dao.ScalperMapper;
 import cn.stylefeng.guns.modular.system.dto.AccountSelectRsp;
 import cn.stylefeng.guns.modular.system.dto.ResponseResult;
 import cn.stylefeng.guns.modular.system.dto.SelectCardReq;
 import cn.stylefeng.guns.modular.system.dto.SelectCardRsp;
+import cn.stylefeng.guns.modular.system.model.Trade;
 import cn.stylefeng.guns.modular.system.service.AssignOrderService;
 import cn.stylefeng.guns.modular.system.service.IBankCardService;
 import cn.stylefeng.guns.modular.system.service.IBankRemarkService;
+import cn.stylefeng.guns.modular.system.service.IScalperService;
 import cn.stylefeng.guns.modular.system.utils.StringUtils;
 import cn.stylefeng.roses.kernel.model.exception.ServiceException;
 import org.slf4j.Logger;
@@ -16,14 +20,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.Map;
 
+import static cn.stylefeng.guns.modular.system.constant.Constant.COMPANY_CASH_OWNER;
 import static cn.stylefeng.guns.modular.system.constant.Constant.Channel.CHANNEL_ALIPAY;
 import static cn.stylefeng.guns.modular.system.constant.Constant.Channel.CHANNEL_BANK;
 import static cn.stylefeng.guns.modular.system.constant.Constant.Channel.CHANNEL_WXCHAT;
-import static cn.stylefeng.guns.modular.system.constant.PayApiEnum.ACCOUNT_SELECT_FAILED;
-import static cn.stylefeng.guns.modular.system.constant.PayApiEnum.BANK_CARD_SELECT_SUC;
+import static cn.stylefeng.guns.modular.system.constant.Constant.Lock.SCALPER_LOCK_PREFIX;
+import static cn.stylefeng.guns.modular.system.constant.PayApiEnum.*;
+import static cn.stylefeng.guns.modular.system.constant.PayApiEnum.UN_KNOW_ERROR;
 
 @Service
 public class AssignOrderServiceImpl implements AssignOrderService {
@@ -35,17 +42,31 @@ public class AssignOrderServiceImpl implements AssignOrderService {
     private ScalperMapper scalperMapper;
 
     @Autowired
+    private IScalperService scalperService;
+
+    @Autowired
     private IBankCardService bankCardService;
 
     @Autowired
     private IBankRemarkService remarkService;
 
+    @Autowired
+    private RedisDao redisDao;
+
+    @Resource
+    private RedisDistributedLock redisDistributedLock;
+
+
     @Transactional
     @Override
-    public AccountSelectRsp accountSelect(String orderNo,Integer channel, BigDecimal amount){
+    public AccountSelectRsp accountSelect(Trade trade){
         Integer try_times = 3;
         ResponseResult result = null;
         String account_info = "";
+        String orderNo = trade.getOrderNo();
+        Integer channel = trade.getChannel();
+        BigDecimal amount = trade.getApplyAmount();
+
         AccountSelectRsp accountSelectRsp = AccountSelectRsp.builder().build();
         accountSelectRsp.setIsSuc(false);
         accountSelectRsp.setAccount_info("");
@@ -88,7 +109,7 @@ public class AssignOrderServiceImpl implements AssignOrderService {
                 accountSelectRsp.setIsSuc(false);
             }
             else {
-                if(updateScalperAccount(scalper_id, amount) > 0){
+                if(updateScalperAccount(trade) > 0){
                     accountSelectRsp.setIsSuc(true);
                 }
                 else {
@@ -118,12 +139,31 @@ public class AssignOrderServiceImpl implements AssignOrderService {
         return accountSelectRsp;
     }
 
-    private Integer updateScalperAccount(String scalper_id, BigDecimal amount) {
-        return scalperMapper.updateScalperAccount(scalper_id,amount);
+    private Integer updateScalperAccount(Trade trade) {
+        boolean locked = true;
+        String scalper_id = trade.getScalperId();
+        BigDecimal amount = trade.getApplyAmount();
+        String locker = redisDao.getKey(SCALPER_LOCK_PREFIX, scalper_id);
+        try{
+            if (redisDistributedLock.lock(locker)) {
+                scalperService.saveScalperCashFlow(trade);
+            }
+            else {
+                locked = false;
+                logger.info("该商户已被其他进程锁定，请等待操作");
+                throw new ServiceException(LOCK_TIMEOUT);
+            }
+        }catch (Exception e){
+            throw new ServiceException(UN_KNOW_ERROR);
+        }finally {
+            logger.info("釋放分布式锁");
+            redisDistributedLock.unlock(locker, locked);
+        }
+        return 1;
     }
 
     private String findBestScalper(Integer channel, BigDecimal amount) {
-        return scalperMapper.findBestScalper(channel,amount);
+        return scalperService.findBestScalper(channel,amount);
     }
 
 
