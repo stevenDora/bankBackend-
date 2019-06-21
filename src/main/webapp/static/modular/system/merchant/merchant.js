@@ -33,8 +33,8 @@ Merchant.initColumn = function () {
             {title: '私钥', field: 'privateKey', visible: true, align: 'center', valign: 'middle'},
             {title: '商户登录密码', field: 'password', visible: false, align: 'center', valign: 'middle'},
             {title: '结算密码', field: 'settlePwd', visible: false, align: 'center', valign: 'middle'},
-            {title: '商户结算是否启用手机验证', field: 'isVerifyPhone', visible: true, align: 'center', valign: 'middle'},
-            {title: '接收验证码的电话码', field: 'verifyPhone', visible: true, align: 'center', valign: 'middle'},
+            {title: '是否开启结算短信验证', field: 'isVerifyPhone', visible: true, align: 'center', valign: 'middle'},
+            {title: '结算手机号', field: 'verifyPhone', visible: true, align: 'center', valign: 'middle'},
             {title: '是否开启对充开关，0否，1是', field: 'isOpenDc', visible: false, align: 'center', valign: 'middle'}
     ];
 };
