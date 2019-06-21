@@ -125,6 +125,10 @@ public class TradeServiceImpl extends ServiceImpl<TradeMapper, Trade> implements
         }
         logger.info("订单匹配成功,打上做账标记!!! " +
                 "orderNo = {} ,orderInfo = {} ",trade.getOrderNo(),trade.toString());
+
+        companyService.tradeNotify(trade);
+        trade.setOrderStatus(ORDER_STATUS_SUCCESS);
+        redisDao.set(trade.getOrderNo(), JSONObject.toJSONString(trade));
     }
 
 

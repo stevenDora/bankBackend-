@@ -211,7 +211,7 @@ public class HttpClient {
     public static String sendPost(String url, String json) {
         HttpPost httpPost = new HttpPost(url);
         try {
-            String referer = "https://countermobile.xi33.net/";
+            String referer = "";
             StringEntity entity = new StringEntity(json, UTF_8);
             entity.setContentType("application/json");
             httpPost.setHeader("Referer",referer);

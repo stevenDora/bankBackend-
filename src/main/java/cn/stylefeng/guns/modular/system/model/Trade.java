@@ -140,6 +140,8 @@ public class Trade extends Model<Trade> {
     @TableField("upt_time")
     private Date uptTime;
 
+    @TableField("notify_url")
+    private String notifyUrl;
 
     public Long getId() {
         return id;

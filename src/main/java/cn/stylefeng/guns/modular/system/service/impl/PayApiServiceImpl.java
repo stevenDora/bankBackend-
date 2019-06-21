@@ -133,6 +133,7 @@ public class PayApiServiceImpl implements PayApiService {
                 .serviceFee(new BigDecimal(0))
                 .orderStatus(ORDER_STATUS_PENDING)
                 .pushStatus(PUSH_STATUS_UNHANDLE)
+                .notifyUrl(req.getNotifyUrl())
                 .build();
 
         return trade;

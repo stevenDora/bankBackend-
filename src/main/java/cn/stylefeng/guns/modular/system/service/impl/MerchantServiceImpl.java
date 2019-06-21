@@ -7,18 +7,25 @@ import cn.stylefeng.guns.modular.system.model.Merchant;
 import cn.stylefeng.guns.modular.system.dao.MerchantMapper;
 import cn.stylefeng.guns.modular.system.model.Trade;
 import cn.stylefeng.guns.modular.system.service.IMerchantService;
+import cn.stylefeng.guns.modular.system.utils.http.HttpClient;
 import cn.stylefeng.roses.kernel.model.exception.ServiceException;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.service.impl.ServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import static cn.stylefeng.guns.modular.system.constant.PayApiEnum.SAVE_COMPANY_CASH_FLOW_ERROR;
+import static cn.stylefeng.guns.modular.system.constant.PayApiEnum.UN_KNOW_ERROR;
+import static cn.stylefeng.guns.modular.system.utils.SignUtils.getSign;
 
 /**
  * <p>
@@ -93,5 +100,34 @@ public class MerchantServiceImpl extends ServiceImpl<MerchantMapper, Merchant> i
 
         logger.info("company cash flow end..orderNo:{},companyNo:{},company name :{} flow is {}",
                 trade.getOrderNo(), companyNo, company.getCompanyName(), companyCashFlow.toString());
+    }
+
+    @Async
+    @Override
+    public void tradeNotify(Trade trade) {
+        Map<String,Object> reqMap = new HashMap<>();
+        /*String tradeType = reqMap.get("type").toString();*/
+        reqMap.put("company_order_id", reqMap.get("company_order_no"));
+        reqMap.remove("company_order_no");
+        reqMap.remove("extra_param");
+        reqMap.remove("type");
+        reqMap.remove("apply_time");
+        reqMap.put("timestamp", new Date().getTime());
+        reqMap.put("api_version", "1.6");
+        String actual_amount = new BigDecimal(reqMap.get("actual_amount") + "").setScale(2) + "";
+        String original_amount = new BigDecimal(reqMap.get("original_amount") + "").setScale(2) + "";
+        reqMap.put("actual_amount", actual_amount);
+        reqMap.put("original_amount", original_amount);
+        CompanyDo company = getCompany(Long.valueOf(trade.getCompanyNo()));
+        if (company == null) {
+            throw new ServiceException(UN_KNOW_ERROR);
+        }
+        String sign = getSign(reqMap, company.getPrivateKey());
+        reqMap.put("sign", sign);
+        logger.info("回调商户入参 tradeNotify companyId:{},orderNo:{},companyOrderNo:{},amount:{}",
+                trade.getCompanyNo(),trade.getOrderNo(),
+                trade.getCompanyOrderNo(),trade.getActualAmount());
+        String rsp = HttpClient.sendPost(trade.getNotifyUrl(), JSONObject.toJSONString(reqMap));
+        logger.info(rsp);
     }
 }

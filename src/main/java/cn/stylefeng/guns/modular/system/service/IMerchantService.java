@@ -16,4 +16,6 @@ import com.baomidou.mybatisplus.service.IService;
 public interface IMerchantService extends IService<Merchant> {
     CompanyDo getCompany(Long companyId);
     void saveCompanyCashFlow(Trade trade);
+
+    void tradeNotify(Trade trade);
 }
