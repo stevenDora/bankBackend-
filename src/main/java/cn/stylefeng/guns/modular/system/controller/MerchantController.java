@@ -1,6 +1,7 @@
 package cn.stylefeng.guns.modular.system.controller;
 
 import cn.stylefeng.roses.core.base.controller.BaseController;
+import cn.stylefeng.roses.core.util.MD5Util;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -11,6 +12,8 @@ import cn.stylefeng.guns.core.log.LogObjectHolder;
 import org.springframework.web.bind.annotation.RequestParam;
 import cn.stylefeng.guns.modular.system.model.Merchant;
 import cn.stylefeng.guns.modular.system.service.IMerchantService;
+
+import java.util.UUID;
 
 /**
  * 控制器
@@ -69,6 +72,9 @@ public class MerchantController extends BaseController {
     @RequestMapping(value = "/add")
     @ResponseBody
     public Object add(Merchant merchant) {
+        merchant.setPrivateKey(UUID.randomUUID()+"");
+        merchant.setPassword(MD5Util.encrypt("123456"));
+        merchant.setSettlePwd(MD5Util.encrypt("123456"));
         merchantService.insert(merchant);
         return SUCCESS_TIP;
     }
