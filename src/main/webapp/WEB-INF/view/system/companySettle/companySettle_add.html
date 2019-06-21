@@ -1,0 +1,51 @@
+@layout("/common/_container.html"){
+<div class="ibox float-e-margins">
+    <div class="ibox-content">
+        <div class="form-horizontal">
+
+            <div class="row">
+                <div class="col-sm-6 b-r">
+                            <#input id="id" name="" underline="true"/>
+                            <#input id="orderNo" name="" underline="true"/>
+                            <#input id="mowOrderNo" name="" underline="true"/>
+                            <#input id="applyAmount" name="" underline="true"/>
+                            <#input id="trueAmount" name="" underline="true"/>
+                            <#input id="serviceFee" name="" underline="true"/>
+                            <#input id="bankCode" name="" underline="true"/>
+                            <#input id="bankName" name="" underline="true"/>
+                            <#input id="subBank" name="" underline="true"/>
+                            <#input id="bankCardNo" name="" underline="true"/>
+                            <#input id="accountName" name="" underline="true"/>
+                            <#input id="status" name="1 processing 2 success 3 failed 4 verifying" underline="true"/>
+                            <#input id="processWay" name="0 自行 1 三方"/>
+                </div>
+
+                <div class="col-sm-6">
+                            <#input id="companyId" name="" underline="true"/>
+                            <#input id="remark" name="" underline="true"/>
+                            <#input id="crtTime" name="" underline="true"/>
+                            <#input id="uptTime" name="" underline="true"/>
+                            <#input id="transTime" name="" underline="true"/>
+                            <#input id="maNo" name="MA编号" underline="true"/>
+                            <#input id="note" name="商户结算附言" underline="true"/>
+                            <#input id="operator" name="商户结算运营操作员" underline="true"/>
+                            <#input id="overTime" name="商户结算订单超时时间" underline="true"/>
+                            <#input id="scalperId" name="抢单金主ID" underline="true"/>
+                            <#input id="scalperImageUrl" name="对充金主交易流水单截图" underline="true"/>
+                            <#input id="phone" name="订单金主手机号" underline="true"/>
+                            <#input id="currency" name="订单结算币种" underline="true"/>
+                </div>
+            </div>
+
+            <div class="row btn-group-m-t">
+                <div class="col-sm-10">
+                    <#button btnCss="info" name="提交" id="ensure" icon="fa-check" clickFun="CompanySettleInfoDlg.addSubmit()"/>
+                    <#button btnCss="danger" name="取消" id="cancel" icon="fa-eraser" clickFun="CompanySettleInfoDlg.close()"/>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+<script src="${ctxPath}/static/modular/system/companySettle/companySettle_info.js"></script>
+@}

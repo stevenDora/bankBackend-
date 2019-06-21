@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.stylefeng.guns.modular.system.dao.CompanySettleMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="cn.stylefeng.guns.modular.system.model.CompanySettle">
+        <id column="id" property="id" />
+        <result column="order_no" property="orderNo" />
+        <result column="mow_order_no" property="mowOrderNo" />
+        <result column="apply_amount" property="applyAmount" />
+        <result column="true_amount" property="trueAmount" />
+        <result column="service_fee" property="serviceFee" />
+        <result column="bank_code" property="bankCode" />
+        <result column="bank_name" property="bankName" />
+        <result column="sub_bank" property="subBank" />
+        <result column="bank_card_no" property="bankCardNo" />
+        <result column="account_name" property="accountName" />
+        <result column="status" property="status" />
+        <result column="process_way" property="processWay" />
+        <result column="company_id" property="companyId" />
+        <result column="remark" property="remark" />
+        <result column="crt_time" property="crtTime" />
+        <result column="upt_time" property="uptTime" />
+        <result column="trans_time" property="transTime" />
+        <result column="ma_no" property="maNo" />
+        <result column="note" property="note" />
+        <result column="operator" property="operator" />
+        <result column="over_time" property="overTime" />
+        <result column="scalper_id" property="scalperId" />
+        <result column="scalper_image_url" property="scalperImageUrl" />
+        <result column="phone" property="phone" />
+        <result column="currency" property="currency" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, order_no, mow_order_no, apply_amount, true_amount, service_fee, bank_code, bank_name, sub_bank, bank_card_no, account_name, status, process_way, company_id, remark, crt_time, upt_time, trans_time, ma_no, note, operator, over_time, scalper_id, scalper_image_url, phone, currency
+    </sql>
+
+</mapper>
