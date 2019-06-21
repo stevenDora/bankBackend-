@@ -1,12 +1,14 @@
 package cn.stylefeng.guns.modular.system.service.impl;
 
 import cn.stylefeng.guns.modular.system.dao.CompanyCashFlowMapper;
-import cn.stylefeng.guns.modular.system.dao.CompanyMapper;
 import cn.stylefeng.guns.modular.system.model.CompanyCashFlow;
 import cn.stylefeng.guns.modular.system.model.CompanyDo;
+import cn.stylefeng.guns.modular.system.model.Merchant;
+import cn.stylefeng.guns.modular.system.dao.MerchantMapper;
 import cn.stylefeng.guns.modular.system.model.Trade;
-import cn.stylefeng.guns.modular.system.service.CompanyService;
+import cn.stylefeng.guns.modular.system.service.IMerchantService;
 import cn.stylefeng.roses.kernel.model.exception.ServiceException;
+import com.baomidou.mybatisplus.service.impl.ServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,12 +20,18 @@ import java.util.Date;
 
 import static cn.stylefeng.guns.modular.system.constant.PayApiEnum.SAVE_COMPANY_CASH_FLOW_ERROR;
 
-
+/**
+ * <p>
+ *  服务实现类
+ * </p>
+ *
+ * @author stylefeng
+ * @since 2019-06-21
+ */
 @Service
-public class CompanyServiceImpl implements CompanyService {
-
+public class MerchantServiceImpl extends ServiceImpl<MerchantMapper, Merchant> implements IMerchantService {
     @Autowired
-    private CompanyMapper companyMapper;
+    private MerchantMapper companyMapper;
 
     @Autowired
     private CompanyCashFlowMapper companyCashFlowMapper;
@@ -33,7 +41,7 @@ public class CompanyServiceImpl implements CompanyService {
         return companyMapper.getCompany(companyId);
     }
 
-    private static Logger logger = LoggerFactory.getLogger(CompanyServiceImpl.class);
+    private static Logger logger = LoggerFactory.getLogger(MerchantServiceImpl.class);
 
     @Override
     @Transactional
@@ -86,5 +94,4 @@ public class CompanyServiceImpl implements CompanyService {
         logger.info("company cash flow end..orderNo:{},companyNo:{},company name :{} flow is {}",
                 trade.getOrderNo(), companyNo, company.getCompanyName(), companyCashFlow.toString());
     }
-
 }

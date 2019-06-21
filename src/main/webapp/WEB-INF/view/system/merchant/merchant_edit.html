@@ -1,0 +1,48 @@
+@layout("/common/_container.html"){
+<div class="ibox float-e-margins">
+    <div class="ibox-content">
+        <div class="form-horizontal">
+
+            <div class="row">
+                <div class="col-sm-6 b-r">
+                            <#input id="id" name="" value="${item.id}" underline="true"/>
+                            <#input id="address" name="地址" value="${item.address}" underline="true"/>
+                            <#input id="charge" name="负责人" value="${item.charge}" underline="true"/>
+                            <#input id="fixPhone" name="固定电话" value="${item.fixPhone}" underline="true"/>
+                            <#input id="companyName" name="商户名称" value="${item.companyName}" underline="true"/>
+                            <#input id="companyCode" name="商户编码" value="${item.companyCode}" underline="true"/>
+                            <#input id="freezingAmount" name="冻结金额" value="${item.freezingAmount}" underline="true"/>
+                            <#input id="availableAmount" name="可用金额" value="${item.availableAmount}" underline="true"/>
+                            <#input id="totalAmount" name="总金额" value="${item.totalAmount}" underline="true"/>
+                            <#input id="email" name="邮箱" value="${item.email}" underline="true"/>
+                            <#input id="website" name="网站" value="${item.website}" />
+                </div>
+
+                <div class="col-sm-6">
+                            <#input id="status" name="1" value="${item.status}" underline="true"/>
+                            <#input id="crtTime" name="创建时间" value="${item.crtTime}" underline="true"/>
+                            <#input id="uptTime" name="修改时间" value="${item.uptTime}" underline="true"/>
+                            <#input id="note" name="备注" value="${item.note}" underline="true"/>
+                            <#input id="ifRate" name="0代表未配置过费率
+1代表已配置过费率（运营后台无法配置商户费率）" value="${item.ifRate}" underline="true"/>
+                            <#input id="privateKey" name="私钥" value="${item.privateKey}" underline="true"/>
+                            <#input id="password" name="商户bsp密码" value="${item.password}" underline="true"/>
+                            <#input id="settlePwd" name="结算密码" value="${item.settlePwd}" underline="true"/>
+                            <#input id="isVerifyPhone" name="商户结算是否启用手机验证" value="${item.isVerifyPhone}" underline="true"/>
+                            <#input id="verifyPhone" name="接收验证码的电话码" value="${item.verifyPhone}" underline="true"/>
+                            <#input id="isOpenDc" name="是否开启对充开关，0否，1是" value="${item.isOpenDc}" />
+                </div>
+            </div>
+
+            <div class="row btn-group-m-t">
+                <div class="col-sm-10">
+                    <#button btnCss="info" name="提交" id="ensure" icon="fa-check" clickFun="MerchantInfoDlg.editSubmit()"/>
+                    <#button btnCss="danger" name="取消" id="cancel" icon="fa-eraser" clickFun="MerchantInfoDlg.close()"/>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+<script src="${ctxPath}/static/modular/system/merchant/merchant_info.js"></script>
+@}

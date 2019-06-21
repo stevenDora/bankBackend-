@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.stylefeng.guns.modular.system.dao.MerchantMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="cn.stylefeng.guns.modular.system.model.Merchant">
+        <id column="id" property="id" />
+        <result column="address" property="address" />
+        <result column="charge" property="charge" />
+        <result column="fix_phone" property="fixPhone" />
+        <result column="company_name" property="companyName" />
+        <result column="company_code" property="companyCode" />
+        <result column="freezing_amount" property="freezingAmount" />
+        <result column="available_amount" property="availableAmount" />
+        <result column="total_amount" property="totalAmount" />
+        <result column="email" property="email" />
+        <result column="website" property="website" />
+        <result column="status" property="status" />
+        <result column="crt_time" property="crtTime" />
+        <result column="upt_time" property="uptTime" />
+        <result column="note" property="note" />
+        <result column="if_rate" property="ifRate" />
+        <result column="private_key" property="privateKey" />
+        <result column="password" property="password" />
+        <result column="settle_pwd" property="settlePwd" />
+        <result column="is_verify_phone" property="isVerifyPhone" />
+        <result column="verify_phone" property="verifyPhone" />
+        <result column="is_open_dc" property="isOpenDc" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, address, charge, fix_phone, company_name, company_code, freezing_amount, available_amount, total_amount, email, website, status, crt_time, upt_time, note, if_rate, private_key, password, settle_pwd, is_verify_phone, verify_phone, is_open_dc
+    </sql>
+
+    <select id="getCompany" resultType="cn.stylefeng.guns.modular.system.model.Merchant">
+        select id,address,charge,fix_phone,company_name,company_code,freezing_amount,
+        available_amount,total_amount,email,website,status,crt_time,
+        upt_time,note,if_rate,private_key
+        from company
+        where id=#{companyId}
+    </select>
+</mapper>

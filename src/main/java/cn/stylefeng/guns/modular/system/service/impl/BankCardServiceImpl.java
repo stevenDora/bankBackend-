@@ -118,7 +118,7 @@ public class BankCardServiceImpl extends ServiceImpl<BankCardMapper, BankCard> i
         BankFlow curCashflow = null;
         try {
             ResponseResult tip = checkCashFlow(cashflowVo,cutOffTime);
-            if(tip instanceof ResponseResult){
+            if(tip instanceof ResponseResult && tip.getCode()!=200){
                 logger.info("cashflowVo = {} is illegal!!!info is {}",cashflowVo.toString(),
                         ((ResponseResult)tip).toString());
                 return tip;
@@ -194,11 +194,11 @@ public class BankCardServiceImpl extends ServiceImpl<BankCardMapper, BankCard> i
 
     @Override
     public void saveFlows(BankFlowsModel req) {
+        String cardNo = req.getBankCashflowVos().get(0).getCardNo();
+        if(null==bankCardMapper.getCardIdByCardNo(cardNo)){
+            throw new ServiceException(BANK_CARD_RECV_FAILED_CARD_NO_INVALID);
+        }
         try {
-            String cardNo = req.getBankCashflowVos().get(0).getCardNo();
-            if(null==bankCardMapper.getCardIdByCardNo(cardNo)){
-                throw new ServiceException(BANK_CARD_RECV_FAILED_CARD_NO_INVALID);
-            }
             Map<String, Object> transLastTimeByCardNo = bankCardMapper.getTransLastTimeByCardNo(cardNo);
             Date cutOff_time = (Date) transLastTimeByCardNo.get("last_transaction_time");
             req.sort();

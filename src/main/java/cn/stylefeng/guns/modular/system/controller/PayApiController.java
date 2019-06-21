@@ -6,7 +6,7 @@ import cn.stylefeng.guns.modular.system.dto.FlowNotifyReq;
 import cn.stylefeng.guns.modular.system.dto.PayDepositReq;
 import cn.stylefeng.guns.modular.system.dto.ResponseResult;
 import cn.stylefeng.guns.modular.system.model.CompanyDo;
-import cn.stylefeng.guns.modular.system.service.CompanyService;
+import cn.stylefeng.guns.modular.system.service.IMerchantService;
 import cn.stylefeng.guns.modular.system.service.PayApiService;
 import cn.stylefeng.guns.modular.system.utils.SignUtils;
 import com.alibaba.fastjson.JSONObject;
@@ -15,7 +15,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,7 +36,7 @@ public class PayApiController {
     private static Logger logger = LoggerFactory.getLogger(PayApiController.class);
 
     @Autowired
-    private CompanyService companyService;
+    private IMerchantService companyService;
 
     @ApiOperation("充值申请")
     @RequestMapping(value = "/deposit")

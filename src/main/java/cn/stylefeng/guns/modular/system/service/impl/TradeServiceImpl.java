@@ -63,7 +63,7 @@ public class TradeServiceImpl extends ServiceImpl<TradeMapper, Trade> implements
     private IScalperService scalperService;
 
     @Autowired
-    private CompanyService companyService;
+    private IMerchantService companyService;
 
     @Override
     public Trade selectTradeByOrderNo(String orderNo) {
