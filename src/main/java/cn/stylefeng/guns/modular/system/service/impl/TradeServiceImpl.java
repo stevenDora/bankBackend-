@@ -159,6 +159,8 @@ public class TradeServiceImpl extends ServiceImpl<TradeMapper, Trade> implements
             logger.info("orderNo:{} has finished account",trade.getOrderNo());
             return;
         }
+        logger.info("orderNo:{} execAccountChange!!!!",trade.getOrderNo());
+
         if(trade.getOrderStatus() == ORDER_STATUS_SUCCESS){
             logger.info("orderNo:{} successfully，execute normal cash flow!!",trade.getOrderNo());
         }

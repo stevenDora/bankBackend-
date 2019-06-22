@@ -1,5 +1,6 @@
 package cn.stylefeng.guns.modular.system.controller;
 
+import cn.stylefeng.guns.core.shiro.ShiroUser;
 import cn.stylefeng.roses.core.base.controller.BaseController;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -11,6 +12,8 @@ import cn.stylefeng.guns.core.log.LogObjectHolder;
 import org.springframework.web.bind.annotation.RequestParam;
 import cn.stylefeng.guns.modular.system.model.ScalperBankAccount;
 import cn.stylefeng.guns.modular.system.service.IScalperBankAccountService;
+
+import static cn.stylefeng.guns.core.shiro.ShiroKit.getUser;
 
 /**
  * 控制器
@@ -69,6 +72,8 @@ public class ScalperBankAccountController extends BaseController {
     @RequestMapping(value = "/add")
     @ResponseBody
     public Object add(ScalperBankAccount scalperBankAccount) {
+        ShiroUser user = getUser();
+        scalperBankAccount.setScalperId(user.getAccount());
         scalperBankAccountService.insert(scalperBankAccount);
         return SUCCESS_TIP;
     }

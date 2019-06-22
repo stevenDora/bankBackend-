@@ -1,7 +1,7 @@
 package cn.stylefeng.guns.modular.system.controller;
 
 import cn.stylefeng.guns.core.common.annotion.BussinessLog;
-import cn.stylefeng.guns.modular.system.annotate.AccessLimit;
+import cn.stylefeng.guns.core.shiro.ShiroUser;
 import cn.stylefeng.guns.modular.system.dto.BankFlowsModel;
 import cn.stylefeng.guns.modular.system.dto.SelectCardReq;
 import cn.stylefeng.guns.modular.system.utils.StringUtils;
@@ -21,6 +21,7 @@ import cn.stylefeng.guns.modular.system.service.IBankCardService;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+import static cn.stylefeng.guns.core.shiro.ShiroKit.getUser;
 import static cn.stylefeng.guns.modular.system.constant.PayApiEnum.*;
 
 /**

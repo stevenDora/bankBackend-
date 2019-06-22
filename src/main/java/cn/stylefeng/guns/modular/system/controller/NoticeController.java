@@ -21,12 +21,14 @@ import cn.stylefeng.guns.core.common.constant.factory.ConstantFactory;
 import cn.stylefeng.guns.core.common.exception.BizExceptionEnum;
 import cn.stylefeng.guns.core.log.LogObjectHolder;
 import cn.stylefeng.guns.core.shiro.ShiroKit;
+import cn.stylefeng.guns.core.shiro.ShiroUser;
 import cn.stylefeng.guns.modular.system.model.Notice;
 import cn.stylefeng.guns.modular.system.service.INoticeService;
 import cn.stylefeng.guns.modular.system.warpper.NoticeWrapper;
 import cn.stylefeng.roses.core.base.controller.BaseController;
 import cn.stylefeng.roses.core.util.ToolUtil;
 import cn.stylefeng.roses.kernel.model.exception.ServiceException;
+import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -38,6 +40,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+
+import static cn.stylefeng.guns.core.shiro.ShiroKit.getUser;
 
 /**
  * 通知控制器
@@ -111,7 +115,7 @@ public class NoticeController extends BaseController {
         if (ToolUtil.isOneEmpty(notice, notice.getTitle(), notice.getContent())) {
             throw new ServiceException(BizExceptionEnum.REQUEST_NULL);
         }
-        notice.setCreater(ShiroKit.getUser().getId());
+        notice.setCreater(getUser().getId());
         notice.setCreatetime(new Date());
         notice.insert();
         return SUCCESS_TIP;
